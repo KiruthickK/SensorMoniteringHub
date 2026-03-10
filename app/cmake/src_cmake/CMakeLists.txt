@@ -11,7 +11,7 @@ file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
 )
 
 add_executable(SensorMonitoringHub ${SRC_FILES})
-
+set_target_properties(SensorMonitoringHub PROPERTIES OUTPUT_NAME "SMH")
 target_include_directories(SensorMonitoringHub PRIVATE
     ${INCLUDE_DIR}
     ${JSON_DIR}

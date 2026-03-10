@@ -21,5 +21,43 @@ namespace sensormoniteringhub{
         void SharedDataStore::Finalize()
         {
         }
+
+        /// @brief Sets the maximum event limit for the SharedDataStore.
+        /// @param maxEvent The maximum number of events to allow.
+        void SharedDataStore::SetMaxEvent(uint16_t maxEvent){
+            maxEvent_ = maxEvent;
+            logger::Logger::LOG("SharedDataStore::SetMaxEvent", "Max event set to: " + std::to_string(maxEvent));
+        }
+
+        /// @brief Sets the memory limit for the SharedDataStore.
+        /// @param memoryType The type of memory to set the limit for.
+        /// @param maxMemoryLimit The maximum limit for the specified memory type.
+        void SharedDataStore::SetMemoryLimit(std::string memoryType, uint16_t maxMemoryLimit){
+            if(std::find(supportedMemoryTypes_.begin(), supportedMemoryTypes_.end(), memoryType) != supportedMemoryTypes_.end()){
+                memoryType_ = memoryType;
+            }else{
+                memoryType_ = "mb";
+                logger::Logger::LOG("SharedDataStore::SetMemoryLimit", "Invalid memory type. Using default 'mb'.", logger::LOGLEVEL::WARNING_LEVEL);
+            }
+            maxMemoryLimit_ = maxMemoryLimit;
+        }
+
+        /// @brief Sets the details for the UDP Receiver.
+        /// @param portNumber The port number for the UDP Receiver.
+        /// @param timeOut The timeout value for the UDP Receiver.
+        void SharedDataStore::SetUdpReceiverDetails(uint16_t portNumber, uint16_t timeOut){
+            udpPortNumber_ = portNumber;
+            udptimeOut_ = timeOut;
+            logger::Logger::LOG("SharedDataStore::SetUdpReceiverDetails", "UDP Receiver details set: Port - " + std::to_string(portNumber) + ", Timeout - " + std::to_string(timeOut) + "ms");
+        }
+
+        /// @brief Sets the details for the TCP Receiver.
+        /// @param portNumber The port number for the TCP Receiver.
+        /// @param timeOut The timeout value for the TCP Receiver.
+        void SharedDataStore::SetTcpReceiverDetails(uint16_t portNumber, uint16_t timeOut){
+            tcpPortNumber_ = portNumber;
+            tcptimeOut_ = timeOut;
+            logger::Logger::LOG("SharedDataStore::SetTcpReceiverDetails", "TCP Receiver details set: Port - " + std::to_string(portNumber) + ", Timeout - " + std::to_string(timeOut) + "ms");
+        }
     }
 }

@@ -1,2 +1,2 @@
 cd ../build
-./SensorMonitoringHub
+./SMH
