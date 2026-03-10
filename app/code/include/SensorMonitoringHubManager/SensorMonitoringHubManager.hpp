@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <memory>
+#include <thread>
+#include <sys/prctl.h>
+#include <csignal>
 #include <Events/IEvents.hpp>
 #include <SensorMonitoringHubManager/ConfigParser.hpp>
 #include <SystemContext/ComponentRegistry.hpp>
@@ -38,6 +41,8 @@ namespace sensormoniteringhub{
             static void Finalize();
         };
     }
+    /// @brief for tracking the finalization
+    std::atomic<bool> gShutdownRequested{false};
 }
 
 #endif

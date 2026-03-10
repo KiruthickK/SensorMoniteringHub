@@ -41,20 +41,49 @@ namespace sensormoniteringhub{
         }
         void SensorMonitoringHubManager::Finalize()
         {
+            std::dynamic_pointer_cast<eventdispatcher::EventDispatcher>(
+                systemcontext::ComponentRegistry::GetComponent("EventDispatcher")
+            )->StopService();
+            timerservice::TimerService::Finalize();
+            clientrequestservice::ResponseEncoder::Finalize();
+            clientrequestservice::RequestParser::Finalize();
+            clientrequestservice::NotificationSender::Finalize();
+            jsonparser::JsonParser::Finalize();
+            datapool::DataPool::Finalize();
+            sensordatareceiver::SensorDataReceiver::Finalize();
+            networkinterfacemanager::UDPReceiver::Finalize();
+            networkinterfacemanager::TCPReceiver::Finalize();
+            eventdispatcher::EventDispatcher::Finalize();
+            systemcontext::SharedDataStore::Finalize();
+            logger::Logger::Finalize();
+            systemcontext::ComponentRegistry::Finalize();
         }
     }
 }
-
+void SignalHandler(int signal)
+{
+    if(signal == SIGTERM || signal == SIGINT)
+    {
+        sensormoniteringhub::gShutdownRequested.store(true);
+    }
+}
 /// @brief The main entry point for the Sensor Monitoring Hub Manager application.
 /// @param argc The number of command-line arguments.
 /// @param argv An array of command-line argument strings.
 /// @return The exit status of the application.
 int main(int argc, char const *argv[])
 {
+    // prctl(PR_SET_NAME, "SMH", 0, 0, 0);
+    std::signal(SIGTERM, SignalHandler);
+    std::signal(SIGINT, SignalHandler);
     std::unique_ptr<sensormoniteringhub::sensormonitoringhubmanager::SensorMonitoringHubManager> SensorMoniteringHub_{
         std::make_unique<sensormoniteringhub::sensormonitoringhubmanager::SensorMonitoringHubManager>()
     };
     SensorMoniteringHub_->Initialize();
     SensorMoniteringHub_->StartService();
+    while(!sensormoniteringhub::gShutdownRequested.load()){
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    SensorMoniteringHub_->Finalize();
     return 0;
 }

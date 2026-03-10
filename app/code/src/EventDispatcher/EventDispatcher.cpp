@@ -8,6 +8,14 @@ namespace sensormoniteringhub{
 
         void EventDispatcher::StopService()
         {
+            logger::Logger::LOG("EventDispatcher::OnInitializeFinish", "Calling StopService for all components");
+            for(auto const& itr : RegisteredComponents_){
+                if(itr.first == "EventDispatcher" || itr.first == "Logger") continue;
+                logger::Logger::LOG("EventDispatcher::OnInitializeFinish", "Calling StopService for component: " + itr.first, logger::LOGLEVEL::DEBUG_LEVEL);
+                itr.second->StopService();
+            }
+            logger::Logger::LOG("EventDispatcher::OnInitializeFinish", "Completed Calling StopService for all components!");
+            RegisteredComponents_["Logger"]->StopService();
         }
 
         /// @brief Initializes the EventDispatcher by creating an instance and registering itself as a component.
