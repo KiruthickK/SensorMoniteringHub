@@ -30,27 +30,29 @@ namespace sensormoniteringhub{
         {
             std::string message{"["+metaData+"] "+str};
             if(LoggerInstance_ == nullptr){
-                std::cerr << "\033[31m" << "[ERROR][Logger::LOG] Logger module is not initialized!" << "\033[0m" << std::endl;
+                std::cerr << RED << "[ERROR][Logger::LOG] Logger module is not initialized!" << RESET << std::endl;
                 return;
             }
             switch (level)
             {
             case LOGLEVEL::INFO_LEVEL:
                 message = "[INFO]" + message;
-                std::cout << message << std::endl;
-                LoggerInstance_->LogMessageQueue_.push(message);
+                std::cout << GREEN << message << RESET << std::endl;
                 break;
             case LOGLEVEL::DEBUG_LEVEL:
                 message = "[DEBUG]" + message;
-                LoggerInstance_->LogMessageQueue_.push(message);
                 break;
             case LOGLEVEL::ERROR_LEVEL:
                 message = "[ERROR]" + message;
-                std::cerr << "\033[31m" << message << "\033[0m" << std::endl;
-                LoggerInstance_->LogMessageQueue_.push(message);
+                std::cerr << RED << message << RESET << std::endl;
+                break;
+            case LOGLEVEL::WARNING_LEVEL:
+                message = "[WARNING!]" + message;
+                std::cerr << YELLOW << message << RESET << std::endl;
             default:
                 break;
             }
+            LoggerInstance_->LogMessageQueue_.push(message);
         }
     }
 }

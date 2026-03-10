@@ -1,0 +1,15 @@
+{
+    "maxEvent" : 5000,
+    "memoryLimit" : {
+        "memoryType" : "mb",
+        "maxMemoryLimit": "512"
+    },
+    "udpReceiverDetails" : {
+        "portNumber" : 8080,
+        "timeOut" : 15
+    },
+    "tcpReceiverDetails" : {
+        "portNumber" : 8090,
+        "timeOut" : 15
+    }
+}

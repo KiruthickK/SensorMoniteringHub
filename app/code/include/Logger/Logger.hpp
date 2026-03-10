@@ -9,22 +9,42 @@
 #include <SystemContext/ComponentRegistry.hpp>
 #include <SystemContext/SharedDataStore.hpp>
 
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define RESET "\033[0m"
+
 namespace sensormoniteringhub{
     namespace logger{
+        /// @brief Defines the log levels for the Logger class.
         enum class LOGLEVEL : uint8_t {
             INFO_LEVEL = 1,
             DEBUG_LEVEL = 2,
-            ERROR_LEVEL = 3
+            ERROR_LEVEL = 3,
+            WARNING_LEVEL = 4
         };
+
+        /// @brief Logger class responsible for logging messages with different log levels.
         class Logger : public IEvents{
             private:
+            /// @brief A static shared pointer to the Logger instance.
             static std::shared_ptr<Logger> LoggerInstance_;
+            /// @brief A queue to store log messages before they are processed.
             std::queue<std::string> LogMessageQueue_;       
+            
             public:
+            /// @brief Initializes the Logger instance.
             virtual void StartService();
+            /// @brief Stops the Logger service.
             virtual void StopService();
+            /// @brief Initializes the Logger instance.
             static void Initialize();
+            /// @brief Finalizes the Logger instance.
             static void Finalize();    
+            /// @brief Logs a message with the specified metadata and log level.
+            /// @param metaData Metadata associated with the log message.
+            /// @param str The log message to be logged.
+            /// @param level The log level for the message (default is INFO_LEVEL).
             static void LOG(std::string metaData, std::string str, LOGLEVEL level = LOGLEVEL::INFO_LEVEL);
         };
     }
