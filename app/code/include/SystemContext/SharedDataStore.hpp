@@ -13,7 +13,9 @@ namespace sensormoniteringhub{
         class SharedDataStore : public IEvents{
             private:
             uint16_t maxEvent_;
+            uint16_t currEventCount_;
             uint16_t maxMemoryLimit_;
+            uint16_t currMemoryUsage_;
             std::string memoryType_;
             std::vector<std::string> supportedMemoryTypes_{"mb", "kb"};
             uint16_t udpPortNumber_;
@@ -29,6 +31,10 @@ namespace sensormoniteringhub{
             void SetMemoryLimit(std::string memoryType, uint16_t maxMemoryLimit);
             void SetUdpReceiverDetails(uint16_t portNumber, uint16_t timeOut);
             void SetTcpReceiverDetails(uint16_t portNumber, uint16_t timeOut);
+            uint16_t GetUdpPortNumber();
+            uint16_t GetTcpPortNumber();
+            uint16_t GetUdpTimeOut();
+            uint16_t GetTcpTimeOut();
         };
     }
 }

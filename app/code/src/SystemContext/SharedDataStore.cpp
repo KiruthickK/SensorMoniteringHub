@@ -59,5 +59,29 @@ namespace sensormoniteringhub{
             tcptimeOut_ = timeOut;
             logger::Logger::LOG("SharedDataStore::SetTcpReceiverDetails", "TCP Receiver details set: Port - " + std::to_string(portNumber) + ", Timeout - " + std::to_string(timeOut) + "ms");
         }
+
+        /// @brief getter method for getting udp port number
+        /// @return udpPortNumber_ 
+        uint16_t SharedDataStore::GetUdpPortNumber(){
+            return udpPortNumber_;
+        }
+
+        /// @brief getter method for gettign tcp port number
+        /// @return 
+        uint16_t SharedDataStore::GetTcpPortNumber(){
+            return tcpPortNumber_;
+        }
+
+        /// @brief getter method for getting udp timeout details
+        /// @return 
+        uint16_t SharedDataStore::GetUdpTimeOut(){
+            return udptimeOut_;
+        }
+
+        /// @brief getter method for getting tcp timeout details
+        /// @return 
+        uint16_t SharedDataStore::GetTcpTimeOut(){
+            return tcptimeOut_;
+        }
     }
 }
