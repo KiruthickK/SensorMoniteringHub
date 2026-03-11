@@ -62,7 +62,8 @@ namespace sensormoniteringhub{
             /// @param metaData Metadata associated with the log message.
             /// @param str The log message to be logged.
             /// @param level The log level for the message (default is INFO_LEVEL).
-            static void LOG(std::string metaData, std::string str, LOGLEVEL level = LOGLEVEL::INFO_LEVEL);
+            /// @param errCode for processing the error if occurs
+            static void LOG(std::string metaData, std::string str, LOGLEVEL level = LOGLEVEL::INFO_LEVEL, int errCode = 0);
             /// @brief Generates a file name for the log file based on the current date and time.
             /// @return A string representing the generated log file name.
             std::string generateFileName();

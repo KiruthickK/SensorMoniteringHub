@@ -2,7 +2,10 @@
 #define SENSOR_DATA_RECEIVER_HEADER
 #include <Events/IEvents.hpp>
 #include <SystemContext/ComponentRegistry.hpp>
+#include <nlohmann/json.hpp>
 #include <Logger/Logger.hpp>
+#include <vector>
+#include <stdint.h>
 
 namespace sensormoniteringhub{
     namespace sensordatareceiver{
@@ -12,6 +15,7 @@ namespace sensormoniteringhub{
             virtual void StopService();
             static void Initialize();
             static void Finalize();
+            void ProcessReceivedUdpData(std::vector<uint8_t> rawData);
         };
     }
 }

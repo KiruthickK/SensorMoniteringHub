@@ -5,8 +5,11 @@
 #include <SystemContext/SharedDataStore.hpp>
 #include <TimerService/TimerService.hpp>
 #include <Logger/Logger.hpp>
+#include <SensorDataReceiver/SensorDataReceiver.hpp>
 #include <thread>
 #include <queue>
+#include <mutex>
+#include <condition_variable>
 #include <atomic>
 #include <vector>
 #include <string>
@@ -29,14 +32,17 @@ namespace sensormoniteringhub{
             std::atomic<bool> udpThreadStopSignal_;
             sockaddr_in activeSender_;
             bool hasActiveSender_;
+            uint64_t lastDataReceivedTimeStamp_;
+            std::mutex receivedDataBufferQueueMutex_;
+            std::condition_variable dataReceivedNotifierCv_;
             void setPortNumber(uint16_t portNumber);
             void setTimeoutSeconds(uint16_t seconds);
             bool CreateAndBindSocket();
             void UdpReceiverLoop();
+            void UdpReceivedDataHandlerToSdrLoop();
             bool IsHandshake(const std::string& msg);
             void SendReply(const sockaddr_in& sender, const std::string& msg);
             bool IsSameSender(const sockaddr_in& sender);
-            uint64_t lastDataReceivedTimeStamp_;
 
             public:
             virtual void StartService();

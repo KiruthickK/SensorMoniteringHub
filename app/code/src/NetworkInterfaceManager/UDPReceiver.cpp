@@ -22,6 +22,7 @@ namespace sensormoniteringhub{
                 }
                 logger::Logger::LOG("UDPReceiver::StartService", "Socket creation and binding successful!");    
                 udpReceiverThread_ = std::thread(&UDPReceiver::UdpReceiverLoop, this);
+                udpReceivedDataHandleToSdrThread_ = std::thread(&UDPReceiver::UdpReceivedDataHandlerToSdrLoop, this);
             }else{
                 logger::Logger::LOG("UDPReceiver::StartService", "Shared Data Store Instance is not available!", logger::LOGLEVEL::ERROR_LEVEL);
             }
@@ -106,7 +107,11 @@ namespace sensormoniteringhub{
                 }
                 // converting the received data to byte vector and storing it in queue for sending with SensorDataReceiver
                 std::vector<uint8_t> data(buffer, buffer + bytes);
-                receivedDataBufferQueue_.push(data);
+                {
+                    std::lock_guard<std::mutex> lock(receivedDataBufferQueueMutex_);
+                    receivedDataBufferQueue_.push(data);
+                }
+                dataReceivedNotifierCv_.notify_one();
             }
         }
 
@@ -137,12 +142,45 @@ namespace sensormoniteringhub{
                 sender.sin_port == activeSender_.sin_port;
         }
 
+        /// @brief method to run in separate thread and waits for udp data to be pushed into the queue, then send it to sensordatareceiver
+        void UDPReceiver::UdpReceivedDataHandlerToSdrLoop(){
+            auto SensorDataReceiverInstance_{
+                std::dynamic_pointer_cast<sensordatareceiver::SensorDataReceiver>(
+                    systemcontext::ComponentRegistry::GetComponent("SensorDataReceiver")
+                )
+            };
+            if(SensorDataReceiverInstance_ == nullptr){
+                logger::Logger::LOG("UDPReceiver::UdpReceivedDataHandlerToSdrLoop", "SensorDataReceiver instance is not available!", logger::LOGLEVEL::ERROR_LEVEL);
+                return;
+            }
+            while(!udpThreadStopSignal_.load()){
+                std::vector<uint8_t> data;
+                {
+                    std::unique_lock<std::mutex> lock(receivedDataBufferQueueMutex_);
+                    dataReceivedNotifierCv_.wait(lock, [this]{
+                        return udpThreadStopSignal_.load() || !receivedDataBufferQueue_.empty();
+                    });
+                    if(udpThreadStopSignal_.load()){
+                        return;
+                    }
+                    data = receivedDataBufferQueue_.front();
+                    receivedDataBufferQueue_.pop();
+                }
+                logger::Logger::LOG("UDPReceiver::UdpReceivedDataHandlerToSdrLoop", "Sending raw data to SensorDataReceiver for processing.", logger::LOGLEVEL::DEBUG_LEVEL);
+                SensorDataReceiverInstance_->ProcessReceivedUdpData(data);
+            }
+        }
+
         /// @brief for stop receiving the udp data
         void UDPReceiver::StopService()
         {
             udpThreadStopSignal_.store(true);
+            dataReceivedNotifierCv_.notify_one();
             if(udpReceiverThread_.joinable()){
                 udpReceiverThread_.join();
+            }
+            if(udpReceivedDataHandleToSdrThread_.joinable()){
+                udpReceivedDataHandleToSdrThread_.join();
             }
             if (sock_ >= 0){
                 close(sock_);
