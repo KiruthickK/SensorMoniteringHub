@@ -1,7 +1,7 @@
-#include "SensorMonitoringHubManager/ConfigParser.hpp"
+#include <JsonParser/ConfigParser.hpp>
 
 namespace sensormoniteringhub{
-    namespace sensormonitoringhubmanager{
+    namespace jsonparser{
         bool ConfigParser::LoadConfigs(std::string const& configPath)
         {
             auto SharedDataStoreInstance{

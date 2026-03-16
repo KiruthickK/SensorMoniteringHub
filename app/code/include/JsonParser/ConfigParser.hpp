@@ -8,7 +8,7 @@
 #include <fstream>
 
 namespace sensormoniteringhub{
-    namespace sensormonitoringhubmanager{
+    namespace jsonparser{
         /// @brief ConfigParser class responsible for loading and setting default configurations for the Sensor Monitoring Hub Manager.
         class ConfigParser{
             public:

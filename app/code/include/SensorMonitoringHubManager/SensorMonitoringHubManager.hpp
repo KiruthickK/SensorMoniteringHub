@@ -7,7 +7,7 @@
 #include <sys/prctl.h>
 #include <csignal>
 #include <Events/IEvents.hpp>
-#include <SensorMonitoringHubManager/ConfigParser.hpp>
+#include <JsonParser/ConfigParser.hpp>
 #include <SystemContext/ComponentRegistry.hpp>
 #include <SystemContext/SharedDataStore.hpp>
 #include <Logger/Logger.hpp>

@@ -6,11 +6,11 @@ namespace sensormoniteringhub{
         /// @brief Starts the Sensor Monitoring Hub service by loading configurations and signaling the completion of initialization.
         void SensorMonitoringHubManager::StartService()
         {
-            if(ConfigParser::LoadConfigs(configPath)){
+            if(jsonparser::ConfigParser::LoadConfigs(configPath)){
                 logger::Logger::LOG("SensorMonitoringHubManager::StartService", "Configs Loaded Successfully");
             } else {
                 logger::Logger::LOG("SensorMonitoringHubManager::StartService", "Failed to Load Configs; setting default configs", logger::LOGLEVEL::WARNING_LEVEL);
-                ConfigParser::SetDefaultConfigs();
+                jsonparser::ConfigParser::SetDefaultConfigs();
             }
             std::dynamic_pointer_cast<systemcontext::ComponentRegistry>(
                 systemcontext::ComponentRegistry::GetComponent("ComponentRegistry")
