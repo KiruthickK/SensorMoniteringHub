@@ -18,6 +18,16 @@ namespace sensormoniteringhub{
             logger::Logger::LOG("DataPool::Initialize", "Initialization successful!");
         }
 
+        /// @brief method which writes the received data to memory
+        /// @param sensorData 
+        void DataPool::WriteDataFromUDPSensorsToDataPool(sensordatareceiver::SensorData sensorData){
+            // updating the latest received data
+            if(lastReceivedSensorData_.timeStamp_ < sensorData.timeStamp_){
+                lastReceivedSensorData_ = sensorData;
+            }
+            receivedSensorDataContainer_.push_back(sensorData);
+        }
+
         void DataPool::Finalize()
         {
         }

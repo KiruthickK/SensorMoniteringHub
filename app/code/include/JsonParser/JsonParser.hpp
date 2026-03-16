@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <SystemContext/ComponentRegistry.hpp>
 #include <Logger/Logger.hpp>
+#include <SensorDataReceiver/SensorData.hpp>
 
 
 namespace sensormoniteringhub{
@@ -15,6 +16,8 @@ namespace sensormoniteringhub{
             virtual void StopService();
             static void Initialize();
             static void Finalize();
+            nlohmann::json ParseJsonFromString(std::string const& jsonString);
+            bool ParseAndValidateUDPSensorData(std::string const& jsonString, sensordatareceiver::SensorData& data);
         };
     }
 }
