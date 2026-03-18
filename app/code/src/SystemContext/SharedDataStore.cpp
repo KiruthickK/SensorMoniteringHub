@@ -60,6 +60,14 @@ namespace sensormoniteringhub{
             logger::Logger::LOG("SharedDataStore::SetTcpReceiverDetails", "TCP Receiver details set: Port - " + std::to_string(portNumber) + ", Timeout - " + std::to_string(timeOut) + "ms");
         }
 
+        /// @brief sets the details for the TCP ClientRequestService
+        /// @param portNumber 
+        /// @param timeOut 
+        void SharedDataStore::SetTcpClientRequestServiceDetails(uint16_t portNumber, uint16_t timeOut){
+            tcpClientRequestServicePortNumber_ = portNumber;
+            tcpClientRequestServicetimeOut_= timeOut;
+            logger::Logger::LOG("SharedDataStore::SetTcpClientRequestServiceDetails", "TCP ClientRequestService Receiver details set: Port - " + std::to_string(portNumber) + ", Timeout - " + std::to_string(timeOut) + "ms");
+        }
         /// @brief getter method for getting udp port number
         /// @return udpPortNumber_ 
         uint16_t SharedDataStore::GetUdpPortNumber(){
@@ -82,6 +90,18 @@ namespace sensormoniteringhub{
         /// @return 
         uint16_t SharedDataStore::GetTcpTimeOut(){
             return tcptimeOut_;
+        }
+
+        /// @brief getter method for getting TcpClientRequestServicePortNumber
+        /// @return tcpClientRequestServicePortNumber_
+        uint16_t SharedDataStore::GetTcpClientRequestServicePortNumber(){
+            return tcpClientRequestServicePortNumber_;
+        }
+
+        /// @brief getter method for getting TcpClientRequestService timeout
+        /// @return tcpClientRequestServicetimeOut_ 
+        uint16_t SharedDataStore::GetTcpClientRequestServiceTimeOut(){
+            return tcpClientRequestServicetimeOut_;
         }
     }
 }

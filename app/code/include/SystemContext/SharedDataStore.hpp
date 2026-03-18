@@ -22,6 +22,8 @@ namespace sensormoniteringhub{
             uint16_t udptimeOut_;
             uint16_t tcpPortNumber_;
             uint16_t tcptimeOut_;
+            uint16_t tcpClientRequestServicePortNumber_;
+            uint16_t tcpClientRequestServicetimeOut_;
             public:
             virtual void StartService();
             virtual void StopService();
@@ -31,10 +33,13 @@ namespace sensormoniteringhub{
             void SetMemoryLimit(std::string memoryType, uint16_t maxMemoryLimit);
             void SetUdpReceiverDetails(uint16_t portNumber, uint16_t timeOut);
             void SetTcpReceiverDetails(uint16_t portNumber, uint16_t timeOut);
+            void SetTcpClientRequestServiceDetails(uint16_t portNumber, uint16_t timeOut);
             uint16_t GetUdpPortNumber();
             uint16_t GetTcpPortNumber();
+            uint16_t GetTcpClientRequestServicePortNumber();
             uint16_t GetUdpTimeOut();
             uint16_t GetTcpTimeOut();
+            uint16_t GetTcpClientRequestServiceTimeOut();
         };
     }
 }

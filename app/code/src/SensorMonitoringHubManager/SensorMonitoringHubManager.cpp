@@ -33,7 +33,7 @@ namespace sensormoniteringhub{
             sensordatareceiver::SensorDataReceiver::Initialize();
             datapool::DataPool::Initialize();
             jsonparser::JsonParser::Initialize();
-            clientrequestservice::NotificationSender::Initialize();
+            clientrequestservice::ClientRequestService::Initialize();
             clientrequestservice::RequestParser::Initialize();
             clientrequestservice::ResponseEncoder::Initialize();
             timerservice::TimerService::Initialize();
@@ -47,7 +47,7 @@ namespace sensormoniteringhub{
             timerservice::TimerService::Finalize();
             clientrequestservice::ResponseEncoder::Finalize();
             clientrequestservice::RequestParser::Finalize();
-            clientrequestservice::NotificationSender::Finalize();
+            clientrequestservice::ClientRequestService::Finalize();
             jsonparser::JsonParser::Finalize();
             datapool::DataPool::Finalize();
             sensordatareceiver::SensorDataReceiver::Finalize();

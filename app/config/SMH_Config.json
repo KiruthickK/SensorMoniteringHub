@@ -11,5 +11,9 @@
     "tcpReceiverDetails" : {
         "portNumber" : 8090,
         "timeOut" : 15
+    },
+    "tcpClientRequestServiceDetails":{
+        "portNumber" : 9090,
+        "timeOut" : 15
     }
 }

@@ -17,7 +17,7 @@
 #include <SensorDataReceiver/SensorDataReceiver.hpp>
 #include <DataPool/DataPool.hpp>
 #include <JsonParser/JsonParser.hpp>
-#include <ClientRequestService/NotificationSender.hpp>
+#include <ClientRequestService/ClientRequestService.hpp>
 #include <ClientRequestService/RequestParser.hpp>
 #include <ClientRequestService/ResponseEncoder.hpp>
 #include <TimerService/TimerService.hpp>
