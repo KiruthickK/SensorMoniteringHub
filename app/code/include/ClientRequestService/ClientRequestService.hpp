@@ -14,6 +14,7 @@ namespace sensormoniteringhub{
             virtual void StopService();
             static void Initialize();
             static void Finalize();
+            std::string HandleRequest(std::string requestStr);
         };
     }
 }

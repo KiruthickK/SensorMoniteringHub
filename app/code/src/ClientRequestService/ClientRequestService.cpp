@@ -25,7 +25,7 @@ namespace sensormoniteringhub{
             if(TcpReceiverInstance){
                 int clientRequestServiceServerSocket{TcpReceiverInstance->CreateAndBindTcpSocket(portNumber)};
                 if(clientRequestServiceServerSocket != -1){
-                    TcpReceiverInstance->TcpReceiverLoopForClientRequestService(clientRequestServiceServerSocket, timeOut);
+                    TcpReceiverInstance->StartReceivingClientRequestServiceThread(clientRequestServiceServerSocket, timeOut);
                 }else{
                     logger::Logger::LOG("ClientRequestService::StartService", "Socket creation and binding failed!", logger::LOGLEVEL::ERROR_LEVEL);    
                 }
@@ -47,6 +47,12 @@ namespace sensormoniteringhub{
 
         void ClientRequestService::Finalize()
         {
+        }
+
+        std::string ClientRequestService::HandleRequest(std::string requestStr){
+            logger::Logger::LOG("ClientRequestService::HandleRequest","Handling request from client");
+            // @todo
+            return "";
         }
     }
 }
