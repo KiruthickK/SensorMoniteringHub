@@ -6,6 +6,7 @@
 #include <SystemContext/ComponentRegistry.hpp>
 #include <Logger/Logger.hpp>
 #include <SensorDataReceiver/SensorData.hpp>
+#include <ClientRequestService/RequestData.hpp>
 
 
 namespace sensormoniteringhub{
@@ -18,6 +19,7 @@ namespace sensormoniteringhub{
             static void Finalize();
             nlohmann::json ParseJsonFromString(std::string const& jsonString);
             bool ParseAndValidateUDPSensorData(std::string const& jsonString, sensordatareceiver::SensorData& data);
+            bool ParseRequestFromTCPClient(std::string const& jsonString, clientrequestservice::RequestData& data);
         };
     }
 }

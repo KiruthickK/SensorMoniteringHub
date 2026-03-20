@@ -16,6 +16,10 @@ namespace sensormoniteringhub{
             logger::Logger::LOG("RequestParser::Initialize", "Initialization successful!");
         }
 
+        bool RequestParser::ParseRequest(std::string const reqStr, RequestData& reqData){
+            // @todo
+        }
+
         void RequestParser::Finalize()
         {
         }

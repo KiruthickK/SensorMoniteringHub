@@ -93,6 +93,45 @@ namespace sensormoniteringhub{
             return true;
         }
 
+        /// @brief parses the request received from tcp client and validates for mandatory param (request_type) and fills the RequestData struct
+        /// @param jsonString 
+        /// @param data 
+        /// @return true if parsing success
+        bool JsonParser::ParseRequestFromTCPClient(std::string const& jsonString, clientrequestservice::RequestData& data){
+            nlohmann::json parsedJson = ParseJsonFromString(jsonString);
+            if(parsedJson.is_null()){
+                logger::Logger::LOG("JsonParser::ParseRequestFromTCPClient", "Received empty JSON", logger::LOGLEVEL::WARNING_LEVEL);
+                return false;
+            }
+            logger::Logger::LOG("JsonParser::ParseRequestFromTCPClient", "Received request data [JSON.dump()]: " + parsedJson.dump(), logger::LOGLEVEL::DEBUG_LEVEL);
+            if(!parsedJson.contains("request_type") || !parsedJson.at("request_type").is_string()){
+                logger::Logger::LOG("JsonParser::ParseRequestFromTCPClient", "Request_type is not present in the request, request json validation failed", logger::LOGLEVEL::ERROR_LEVEL);
+                return false;
+            }
+            if(!parsedJson.contains("request_id") || !parsedJson.at("request_id").is_string()){
+                logger::Logger::LOG("JsonParser::ParseRequestFromTCPClient", "request_id is not present in the request, request json validation failed", logger::LOGLEVEL::ERROR_LEVEL);
+                return false;
+            }
+            data.reqType_ = parsedJson.at("request_type");
+            data.reqId_= parsedJson.at("request_id");
+            if(parsedJson.contains("zone_id") && parsedJson.at("zone_id").is_string()){
+                data.zone_id_ = parsedJson.at("zone_id");
+            }
+            if(parsedJson.contains("from_time") && parsedJson.at("from_time").is_number()){
+                data.from_time_ = parsedJson.at("from_time");
+            }
+            if(parsedJson.contains("to_time") && parsedJson.at("to_time").is_number()){
+                data.to_time_= parsedJson.at("to_time");
+            }
+            if(parsedJson.contains("format") && parsedJson.at("format").is_string()){
+                data.op_format_ = parsedJson.at("format");
+            }
+            if(parsedJson.contains("limit") && parsedJson.at("limit").is_number()){
+                data.limit_= parsedJson.at("limit");
+            }
+            return true;
+        }
+
         void JsonParser::Finalize()
         {
         }
