@@ -16,7 +16,7 @@ namespace sensormoniteringhub{
             logger::Logger::LOG("RequestParser::Initialize", "Initialization successful!");
         }
 
-        bool RequestParser::ParseRequest(std::string const& reqStr, RequestData& reqData){
+        bool RequestParser::ParseRequest(std::string const& reqStr, RequestData& reqData, std::vector<sensordatareceiver::SensorData> &responseDataContainer){
             auto jsonParserInstance{
                 std::dynamic_pointer_cast<jsonparser::JsonParser>(
                     systemcontext::ComponentRegistry::GetComponent("JsonParser")
@@ -55,18 +55,11 @@ namespace sensormoniteringhub{
                 bool isTimeStampPresent{false};
                 bool isLimitPresent{false};
                 if(ValidateEventGetEvents(reqData, isZoneIdPresent, isTimeStampPresent, isLimitPresent)){
-                    // case 3
-                    if(isZoneIdPresent && isTimeStampPresent){
-                        auto filteredSensorData{
-                            dataPoolInstance->GetEventsBasedOnZoneAndTimeStamp(reqData, isLimitPresent)
-                        };
-                        std::cout<<"[DEBUG] STL size: "<<filteredSensorData.size()<<std::endl;
-                        // @todo
-                    }else if(isZoneIdPresent){ //case 1
-                        // @todo
-                    }else if(isTimeStampPresent){ //case 2
-                        // @todo
+                    if(!dataPoolInstance->GetEventsBasedOnZoneAndTimeStamp(reqData, responseDataContainer, isZoneIdPresent, isTimeStampPresent, isLimitPresent)){
+                        logger::Logger::LOG("RequestParser::ParseRequest", "No data available for the request : " + reqData.reqId_, logger::LOGLEVEL::WARNING_LEVEL);
+                        return false;
                     }
+                    logger::Logger::LOG("RequestParser::ParseRequest", "Data available for the request : " + reqData.reqId_);
                 }else{
                     logger::Logger::LOG("RequestParser::ParseRequest", "Invalid Request", logger::LOGLEVEL::ERROR_LEVEL);
                 }
@@ -108,9 +101,9 @@ namespace sensormoniteringhub{
         /// @param isLimitPresent 
         /// @return 
         bool RequestParser::ValidateEventGetEvents(RequestData const& reqData, bool& isZoneIdPresent, bool& isTimeStampPresent, bool& isLimitPresent){
-            isZoneIdPresent = (reqData.zone_id_ != "");
+            isZoneIdPresent = (!reqData.zone_id_.empty());
             isLimitPresent = (reqData.limit_ != 0U);
-            isTimeStampPresent = (reqData.from_time_ != 0U && reqData.to_time_ != 0U);
+            isTimeStampPresent = (reqData.from_time_ != 0U && reqData.to_time_ != 0U && (reqData.from_time_ < reqData.to_time_));
             return isZoneIdPresent || isTimeStampPresent;
         }
 

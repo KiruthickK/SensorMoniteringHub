@@ -29,26 +29,63 @@ int main()
         return 1;
     }
     std::cout << "Connected to server\n";
+    int reqNo;
     std::string request;
     while (true)
     {
+        std::cout << "Enter 1 for GET_EVENTS with both timestamp and zone id\n"
+            "Enter 2 for GET_EVENTS with only timestamp\n"
+            "Enter 3 for GET_EVENTS with only zone id\n" 
+            "Enter -1 for exit" 
+            << std::endl;
         std::cout << "Enter request (or quit): ";
-        std::getline(std::cin, request);
+        std::cin >> reqNo;
         nlohmann::json jsonReq;
-        if (request == "quit")
+        if (reqNo == -1)
             break;
-        else if(request == "GET_EVENTS"){
-            jsonReq["request_id"] = ("RN" + std::to_string(reqId++));
-            jsonReq["zone_id"] = "ROOM_A";
-            jsonReq["request_type"] = "GET_EVENTS";
-            auto now = std::chrono::system_clock::now();
-            auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-                now.time_since_epoch()
-            ).count();
-            jsonReq["to_time"] = nowMs;
-            jsonReq["from_time"] = nowMs - 5000;
-            if(reqId % 3 == 0){
-                jsonReq["limit"] = 2;
+        else{
+            if(reqNo == 1 || reqNo == 2 || reqNo == 3){
+                jsonReq["request_id"] = ("RN" + std::to_string(reqId++));
+                jsonReq["request_type"] = "GET_EVENTS";
+            }
+            switch (reqNo){
+                case 1:
+                {
+                    auto now = std::chrono::system_clock::now();
+                    auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        now.time_since_epoch()
+                    ).count();
+                    jsonReq["zone_id"] = "ROOM_A";
+                    jsonReq["to_time"] = nowMs;
+                    jsonReq["from_time"] = nowMs - 5000;
+                    if(reqId % 3 == 0){
+                        jsonReq["limit"] = 2;
+                    }
+                }
+                break;
+                case 2:
+                {
+                    auto now = std::chrono::system_clock::now();
+                    auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        now.time_since_epoch()
+                    ).count();
+                    jsonReq["to_time"] = nowMs;
+                    jsonReq["from_time"] = nowMs - 5000;
+                    if(reqId % 3 == 0){
+                        jsonReq["limit"] = 2;
+                    }
+                }
+                break;
+                case 3:
+                {
+                    jsonReq["zone_id"] = "ROOM_A";
+                }
+                break;
+            }
+            std::cout<<"Enter the limit you want to give for the output, -1 if you want all the results"<<std::endl;
+            std::cin >> reqNo;
+            if(reqId != -1){
+                jsonReq["limit"] = reqNo;
             }
             request = jsonReq.dump();
         }

@@ -132,6 +132,36 @@ namespace sensormoniteringhub{
             return true;
         }
 
+        /// @brief method to form json from SensorData objects and return the dumped string
+        /// @param sensorDataContainer 
+        /// @param reqData 
+        /// @return 
+        std::string JsonParser::SerializeResponseToTCPClientForGetEvents(std::vector <sensordatareceiver::SensorData> const& sensorDataContainer, clientrequestservice::RequestData const& reqData){
+            nlohmann::json responseJson;
+            if(sensorDataContainer.empty()){
+                logger::Logger::LOG("JsonParser::SerializeResponseToTCPClientForGetEvents", "responseData Container is empty", logger::LOGLEVEL::ERROR_LEVEL);
+                return "";
+            }
+            responseJson["response_id"] = reqData.reqId_;
+            if(!reqData.zone_id_.empty()){
+                responseJson["zone_id"] = reqData.zone_id_;
+            }
+            if(reqData.from_time_ > 0 && reqData.to_time_ > 0){
+                responseJson["from_time"] = reqData.from_time_;
+                responseJson["to_time"] = reqData.to_time_;
+            }
+            responseJson["sensor_data_readings"] = nlohmann::json::array();
+            for(auto const& sensorData : sensorDataContainer){
+                nlohmann::json sensor_data_reading;
+                sensor_data_reading["timestamp"] = sensorData.timeStamp_;
+                sensor_data_reading["motion_intensity"] = sensorData.motionIntensity_;
+                sensor_data_reading["temperature"] = sensorData.temperature_;
+                sensor_data_reading["battery_level"] = sensorData.batteryLevel_;
+                responseJson["sensor_data_readings"].push_back(sensor_data_reading);
+            }
+            return responseJson.dump();
+        }
+
         void JsonParser::Finalize()
         {
         }

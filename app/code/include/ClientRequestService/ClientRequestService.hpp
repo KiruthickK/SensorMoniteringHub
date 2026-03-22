@@ -6,6 +6,7 @@
 #include <SystemContext/SharedDataStore.hpp>
 #include <ClientRequestService/RequestData.hpp>
 #include <ClientRequestService/RequestParser.hpp>
+#include <ClientRequestService/ResponseEncoder.hpp>
 #include <NetworkInterfaceManager/TCPReceiver.hpp>
 #include <Logger/Logger.hpp>
 

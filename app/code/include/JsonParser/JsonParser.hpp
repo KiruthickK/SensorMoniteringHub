@@ -20,6 +20,7 @@ namespace sensormoniteringhub{
             nlohmann::json ParseJsonFromString(std::string const& jsonString);
             bool ParseAndValidateUDPSensorData(std::string const& jsonString, sensordatareceiver::SensorData& data);
             bool ParseRequestFromTCPClient(std::string const& jsonString, clientrequestservice::RequestData& data);
+            std::string SerializeResponseToTCPClientForGetEvents(std::vector <sensordatareceiver::SensorData> const& sensorDataContainer, clientrequestservice::RequestData const& reqData);
         };
     }
 }

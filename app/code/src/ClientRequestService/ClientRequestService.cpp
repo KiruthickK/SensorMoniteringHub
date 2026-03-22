@@ -59,15 +59,25 @@ namespace sensormoniteringhub{
                 logger::Logger::LOG("ClientRequestService::HandleRequest","Request parser instance not available",logger::LOGLEVEL::ERROR_LEVEL);
                 return "-1"; // get internal error response from response encoder and send the response @todo
             }
+            std::vector<sensordatareceiver::SensorData> responseDataContainer;
             bool reqParsedResult{
-                reqParserInstance->ParseRequest(request, reqData)
+                reqParserInstance->ParseRequest(request, reqData, responseDataContainer)
             };
             if(!reqParsedResult){
                 logger::Logger::LOG("ClientRequestService::HandleRequest","Request parser instance not available",logger::LOGLEVEL::ERROR_LEVEL);
                 return "-1"; // get invalid request from responseEncoder and send the response @todo
             }
-            // @todo
-            return "";
+            // creating response
+            auto responseEncoder{
+                std::dynamic_pointer_cast<ResponseEncoder>(
+                    systemcontext::ComponentRegistry::GetComponent("ResponseEncoder")
+                )
+            };
+            if(!responseEncoder){
+                logger::Logger::LOG("ClientRequestService::HandleRequest","Response Encoder instance not available",logger::LOGLEVEL::ERROR_LEVEL);
+                return "-1"; // get invalid request from responseEncoder and send the response @todo
+            }
+            return responseEncoder->EncodeResponseToString(responseDataContainer, reqData);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace sensormoniteringhub{
             virtual void StopService();
             static void Initialize();
             static void Finalize();
-            bool ParseRequest(std::string const& reqStr, RequestData& reqData);
+            bool ParseRequest(std::string const& reqStr, RequestData& reqData, std::vector<sensordatareceiver::SensorData> &responseDataContainer);
             bool ValidateEventGetEvents(RequestData const& reqData, bool& isZoneIdPresent, bool& isTimeStampPresent, bool& isLimitPresent);
         };
     }
