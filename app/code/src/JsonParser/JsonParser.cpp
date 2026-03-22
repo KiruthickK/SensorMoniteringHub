@@ -112,7 +112,7 @@ namespace sensormoniteringhub{
                 logger::Logger::LOG("JsonParser::ParseRequestFromTCPClient", "request_id is not present in the request, request json validation failed", logger::LOGLEVEL::ERROR_LEVEL);
                 return false;
             }
-            data.reqType_ = parsedJson.at("request_type");
+            data.reqType_ = clientrequestservice::GetRequestType(parsedJson.at("request_type").get<std::string>());
             data.reqId_= parsedJson.at("request_id");
             if(parsedJson.contains("zone_id") && parsedJson.at("zone_id").is_string()){
                 data.zone_id_ = parsedJson.at("zone_id");

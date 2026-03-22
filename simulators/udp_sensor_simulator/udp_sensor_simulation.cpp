@@ -1,5 +1,6 @@
-#include "nlohmann/json.hpp"
-
+#include "../nlohmann/json.hpp"
+#include <chrono>
+#include <cstdint>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -101,17 +102,25 @@ void SendData()
         for (const auto& file : jsonFiles)
         {
             std::ifstream in(file);
-
+            nlohmann::json j;
             if (!in)
             {
                 std::cout << "Failed to open file: " << file << "\n";
                 continue;
             }
-
-            std::string msg(
-                (std::istreambuf_iterator<char>(in)),
-                std::istreambuf_iterator<char>()
-            );
+            try {
+                in >> j;
+            } catch (const std::exception& e) {
+                std::cout << "JSON parse error: " << e.what() << "\n";
+                continue;
+            }
+            if(j.contains("timestamp")){
+                auto now = std::chrono::system_clock::now().time_since_epoch();
+                j["timestamp"] = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+            }
+            std::string msg{
+                j.dump()
+            };
 
             std::vector<uint8_t> bytes(msg.begin(), msg.end());
 
