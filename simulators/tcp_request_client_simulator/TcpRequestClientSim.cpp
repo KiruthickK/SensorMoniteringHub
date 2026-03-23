@@ -36,6 +36,7 @@ int main()
         std::cout << "Enter 1 for GET_EVENTS with both timestamp and zone id\n"
             "Enter 2 for GET_EVENTS with only timestamp\n"
             "Enter 3 for GET_EVENTS with only zone id\n" 
+            "Enter 4 for GET_LATEST\n" 
             "Enter -1 for exit" 
             << std::endl;
         std::cout << "Enter request (or quit): ";
@@ -81,11 +82,18 @@ int main()
                     jsonReq["zone_id"] = "ROOM_A";
                 }
                 break;
+                case 4:
+                {
+                    jsonReq["request_id"] = ("RN" + std::to_string(reqId++));
+                    jsonReq["request_type"] = "GET_LATEST";
+                }
             }
-            std::cout<<"Enter the limit you want to give for the output, -1 if you want all the results"<<std::endl;
-            std::cin >> reqNo;
-            if(reqId != -1){
-                jsonReq["limit"] = reqNo;
+            if(reqNo == 1 || reqNo == 2 || reqNo == 3){
+                std::cout<<"Enter the limit you want to give for the output, -1 if you want all the results"<<std::endl;
+                std::cin >> reqNo;
+                if(reqId != -1){
+                    jsonReq["limit"] = reqNo;
+                }
             }
             request = jsonReq.dump();
         }

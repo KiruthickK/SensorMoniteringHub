@@ -6,16 +6,18 @@
 #include <SensorDataReceiver/SensorData.hpp>
 #include <ClientRequestService/RequestData.hpp>
 #include <JsonParser/JsonParser.hpp>
+#include <variant>
 
 namespace sensormoniteringhub{
     namespace clientrequestservice{
+        using SensorInput = std::variant<sensordatareceiver::SensorData, std::vector<sensordatareceiver::SensorData>>;
         class ResponseEncoder : public IEvents{
             public:
             virtual void StartService();
             virtual void StopService();
             static void Initialize();
             static void Finalize();
-            std::string EncodeResponseToString(std::vector<sensordatareceiver::SensorData> const& responseData, RequestData const& reqData);
+            std::string EncodeResponseToString(SensorInput const& responseData, RequestData const& reqData);
         };
     }
 }

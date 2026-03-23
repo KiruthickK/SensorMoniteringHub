@@ -16,7 +16,11 @@ namespace sensormoniteringhub{
             logger::Logger::LOG("RequestParser::Initialize", "Initialization successful!");
         }
 
-        bool RequestParser::ParseRequest(std::string const& reqStr, RequestData& reqData, std::vector<sensordatareceiver::SensorData> &responseDataContainer){
+        /// @brief Method for parsing the request with help of jsonparser module
+        /// @param reqStr 
+        /// @param reqData 
+        /// @return true if parsing success 
+        bool RequestParser::ParseRequest(std::string const& reqStr, RequestData& reqData){
             auto jsonParserInstance{
                 std::dynamic_pointer_cast<jsonparser::JsonParser>(
                     systemcontext::ComponentRegistry::GetComponent("JsonParser")
@@ -32,80 +36,9 @@ namespace sensormoniteringhub{
                 logger::Logger::LOG("RequestParser::ParseRequest", "Json parsing failed for the received request from client", logger::LOGLEVEL::ERROR_LEVEL);
                 return false;
             }
-            auto dataPoolInstance{
-                std::dynamic_pointer_cast<datapool::DataPool>(
-                    systemcontext::ComponentRegistry::GetComponent("DataPool")
-                )
-            };
-            if(!dataPoolInstance){
-                logger::Logger::LOG("RequestParser::ParseRequest", "DataPool instance not available", logger::LOGLEVEL::ERROR_LEVEL);
-                return false;
-            }
-            switch (reqData.reqType_)
-            {
-            case RequestType::GET_EVENTS:
-            {
-                    /**
-                 * For GET_EVENTS three combinations are allowed
-                 * 1. zone_id with or without limit
-                 * 2. from and to time specified with or without limit
-                 * 3. combination of 1. and 2.
-                 */
-                bool isZoneIdPresent{false};
-                bool isTimeStampPresent{false};
-                bool isLimitPresent{false};
-                if(ValidateEventGetEvents(reqData, isZoneIdPresent, isTimeStampPresent, isLimitPresent)){
-                    if(!dataPoolInstance->GetEventsBasedOnZoneAndTimeStamp(reqData, responseDataContainer, isZoneIdPresent, isTimeStampPresent, isLimitPresent)){
-                        logger::Logger::LOG("RequestParser::ParseRequest", "No data available for the request : " + reqData.reqId_, logger::LOGLEVEL::WARNING_LEVEL);
-                        return false;
-                    }
-                    logger::Logger::LOG("RequestParser::ParseRequest", "Data available for the request : " + reqData.reqId_);
-                }else{
-                    logger::Logger::LOG("RequestParser::ParseRequest", "Invalid Request", logger::LOGLEVEL::ERROR_LEVEL);
-                }
-                break;
-            }
-            case RequestType::GET_LATEST:
-            {
-                // @todo
-                break;
-            }
-            case RequestType::GET_SENSOR_STATUS:
-            {
-                // @todo
-                break;
-            }
-            case RequestType::GET_STATS:
-            {
-                // @todo
-                break;
-            }
-            case RequestType::GET_ZONES:
-            {
-                // @todo
-                break;
-            }
-            default:
-                logger::Logger::LOG("RequestParser::ParseRequest", "UNKNOWN request type", logger::LOGLEVEL::ERROR_LEVEL);
-                return false;
-                break;
-            }
-
             return true;
         }
 
-        /// @brief helper method for validating the parsed response
-        /// @param reqData 
-        /// @param isZoneIdPresent 
-        /// @param isTimeStampPresent 
-        /// @param isLimitPresent 
-        /// @return 
-        bool RequestParser::ValidateEventGetEvents(RequestData const& reqData, bool& isZoneIdPresent, bool& isTimeStampPresent, bool& isLimitPresent){
-            isZoneIdPresent = (!reqData.zone_id_.empty());
-            isLimitPresent = (reqData.limit_ != 0U);
-            isTimeStampPresent = (reqData.from_time_ != 0U && reqData.to_time_ != 0U && (reqData.from_time_ < reqData.to_time_));
-            return isZoneIdPresent || isTimeStampPresent;
-        }
 
         void RequestParser::Finalize()
         {

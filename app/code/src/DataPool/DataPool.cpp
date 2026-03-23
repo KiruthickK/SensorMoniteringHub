@@ -38,42 +38,59 @@ namespace sensormoniteringhub{
         /// @return true if data is present, else false 
         bool DataPool::GetEventsBasedOnZoneAndTimeStamp(clientrequestservice::RequestData const& reqData, std::vector<sensordatareceiver::SensorData> &filteredSensorData, bool const isZoneIdPresent, bool const isTimeStampPresent, bool const isLimitedResults){
             filteredSensorData.clear();
+            std::vector<sensordatareceiver::SensorData> localCopyOfreceivedSensorDataContainer;
             {
                 std::lock_guard<std::mutex> lock(receivedSensorDataContainerMutex_);
-                uint64_t currentLimit{0U};
-                for(auto const& sd: receivedSensorDataContainer_){
-                    /**
-                     * If timestamp alone is present, then the data should filter based only on timestamp alone,
-                     * If Zone id alone is present, then the data should filter based only on zone id,
-                     * If both are present, then based on both the data should be filtered,
-                     * Limit is optional, if present, we have to limit the data, else let the complete results
-                     * to shared in the response
-                     */
-                    bool filterResult{
-                        ((isTimeStampPresent && isZoneIdPresent) && 
-                            (
-                                ((sd.timeStamp_ >= reqData.from_time_) && (sd.timeStamp_ <= reqData.to_time_)) && 
-                                (sd.zoneId_ == reqData.zone_id_)
-                            )
-                        ) ||
+                localCopyOfreceivedSensorDataContainer = receivedSensorDataContainer_;
+            }
+            uint64_t currentLimit{0U};
+            for(auto const& sd: localCopyOfreceivedSensorDataContainer){
+                /**
+                 * If timestamp alone is present, then the data should filter based only on timestamp alone,
+                 * If Zone id alone is present, then the data should filter based only on zone id,
+                 * If both are present, then based on both the data should be filtered,
+                 * Limit is optional, if present, we have to limit the data, else let the complete results
+                 * to shared in the response
+                 */
+                bool filterResult{
+                    ((isTimeStampPresent && isZoneIdPresent) && 
                         (
-                            isTimeStampPresent && 
-                            (
-                                (sd.timeStamp_ >= reqData.from_time_) && (sd.timeStamp_ <= reqData.to_time_)
-                            )
-                        ) || 
-                        (isZoneIdPresent && (sd.zoneId_ == reqData.zone_id_))
-                    };
-                    if(filterResult){
-                        filteredSensorData.push_back(sd);
-                        currentLimit++;
-                        if(isLimitedResults && currentLimit >= reqData.limit_){
-                            break;
-                        }
+                            ((sd.timeStamp_ >= reqData.from_time_) && (sd.timeStamp_ <= reqData.to_time_)) && 
+                            (sd.zoneId_ == reqData.zone_id_)
+                        )
+                    ) ||
+                    (
+                        isTimeStampPresent && 
+                        (
+                            (sd.timeStamp_ >= reqData.from_time_) && (sd.timeStamp_ <= reqData.to_time_)
+                        )
+                    ) || 
+                    (isZoneIdPresent && (sd.zoneId_ == reqData.zone_id_))
+                };
+                if(filterResult){
+                    filteredSensorData.push_back(sd);
+                    currentLimit++;
+                    if(isLimitedResults && currentLimit >= reqData.limit_){
+                        break;
                     }
                 }
             }
             return !filteredSensorData.empty();
+        }
+
+        /// @brief returns the latest sensor data received by the application
+        /// @param sensorData 
+        /// @return true if data is available
+        bool DataPool::GetLastReceivedData(sensordatareceiver::SensorData& sensorData){
+            {
+                std::lock_guard<std::mutex> lock(receivedSensorDataContainerMutex_);
+                if(lastReceivedSensorData_.sensorId_.empty()){
+                    logger::Logger::LOG("DataPool::GetLastReceivedData", "No data available", logger::LOGLEVEL::WARNING_LEVEL);
+                    return false;
+                }
+            sensorData = lastReceivedSensorData_;
+            }
+            return true;
         }
 
         void DataPool::Finalize()

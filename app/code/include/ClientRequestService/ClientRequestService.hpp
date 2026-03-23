@@ -8,11 +8,14 @@
 #include <ClientRequestService/RequestParser.hpp>
 #include <ClientRequestService/ResponseEncoder.hpp>
 #include <NetworkInterfaceManager/TCPReceiver.hpp>
+#include <DataPool/DataPool.hpp>
 #include <Logger/Logger.hpp>
 
 namespace sensormoniteringhub{
     namespace clientrequestservice{
         class ClientRequestService : public IEvents, public IClientRequestHandler{
+            private:
+            bool ValidateEventGetEvents(RequestData const &reqData, bool &isZoneIdPresent, bool &isTimeStampPresent, bool &isLimitPresent);
             public:
             virtual void StartService();
             virtual void StopService();

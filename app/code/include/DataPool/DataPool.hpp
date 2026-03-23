@@ -23,7 +23,8 @@ namespace sensormoniteringhub{
             static void Initialize();
             static void Finalize();
             void WriteDataFromUDPSensorsToDataPool(sensordatareceiver::SensorData sensorData);
-            bool GetEventsBasedOnZoneAndTimeStamp(clientrequestservice::RequestData const& reqData, std::vector<sensordatareceiver::SensorData> &filteredSensorData, bool const isZoneIdPresent, bool const isTimeStampPresent, bool const isLimitedResults = false);
+            [[nodiscard]] bool GetEventsBasedOnZoneAndTimeStamp(clientrequestservice::RequestData const& reqData, std::vector<sensordatareceiver::SensorData> &filteredSensorData, bool const isZoneIdPresent, bool const isTimeStampPresent, bool const isLimitedResults = false);
+            [[nodiscard]] bool GetLastReceivedData(sensordatareceiver::SensorData& sensorData);
         };
     }
 }

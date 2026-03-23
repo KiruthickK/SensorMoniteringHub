@@ -17,15 +17,15 @@ namespace sensormoniteringhub{
         /// @param str 
         /// @return enum type of the given request
         inline RequestType GetRequestType(std::string const& str){
-            if(str == "GET_EVENTS"){
+            if(str == std::string_view{"GET_EVENTS"}){
                 return RequestType::GET_EVENTS;
-            }else if(str == "GET_LATEST"){
+            }else if(str == std::string_view{"GET_LATEST"}){
                 return RequestType::GET_LATEST;
-            }else if(str == "GET_ZONES"){
+            }else if(str == std::string_view{"GET_ZONES"}){
                 return RequestType::GET_ZONES;
-            }else if(str == "GET_SENSOR_STATUS"){
+            }else if(str == std::string_view{"GET_SENSOR_STATUS"}){
                 return RequestType::GET_SENSOR_STATUS;
-            }else if(str == "GET_STATS"){
+            }else if(str == std::string_view{"GET_STATS"}){
                 return RequestType::GET_STATS;
             }
             return RequestType::UNKNOWN;

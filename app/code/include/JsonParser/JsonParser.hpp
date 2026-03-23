@@ -21,6 +21,7 @@ namespace sensormoniteringhub{
             bool ParseAndValidateUDPSensorData(std::string const& jsonString, sensordatareceiver::SensorData& data);
             bool ParseRequestFromTCPClient(std::string const& jsonString, clientrequestservice::RequestData& data);
             std::string SerializeResponseToTCPClientForGetEvents(std::vector <sensordatareceiver::SensorData> const& sensorDataContainer, clientrequestservice::RequestData const& reqData);
+            std::string SerializeResponseToTCPClientForGetLatest(sensordatareceiver::SensorData const& sensorDataContainer, clientrequestservice::RequestData const& reqData);
         };
     }
 }

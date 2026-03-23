@@ -157,8 +157,25 @@ namespace sensormoniteringhub{
                 sensor_data_reading["motion_intensity"] = sensorData.motionIntensity_;
                 sensor_data_reading["temperature"] = sensorData.temperature_;
                 sensor_data_reading["battery_level"] = sensorData.batteryLevel_;
+                sensor_data_reading["sensor_id"] = sensorData.sensorId_;
                 responseJson["sensor_data_readings"].push_back(sensor_data_reading);
             }
+            return responseJson.dump();
+        }
+
+        /// @brief method to form json from latest sensor data
+        /// @param sensorDataContainer 
+        /// @param reqData 
+        /// @return dumped string of formed json object
+        std::string JsonParser::SerializeResponseToTCPClientForGetLatest(sensordatareceiver::SensorData const& sensorDataContainer, clientrequestservice::RequestData const& reqData){
+            nlohmann::json responseJson;
+            responseJson["response_id"] = reqData.reqId_;
+            responseJson["zone_id"] = sensorDataContainer.zoneId_;
+            responseJson["timestamp"] = sensorDataContainer.timeStamp_;
+            responseJson["motion_intensity"] = sensorDataContainer.motionIntensity_;
+            responseJson["temperature"] = sensorDataContainer.temperature_;
+            responseJson["battery_level"] = sensorDataContainer.batteryLevel_;
+            responseJson["sensor_id"] = sensorDataContainer.sensorId_;
             return responseJson.dump();
         }
 
