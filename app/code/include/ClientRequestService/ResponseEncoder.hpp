@@ -10,7 +10,7 @@
 
 namespace sensormoniteringhub{
     namespace clientrequestservice{
-        using SensorInput = std::variant<sensordatareceiver::SensorData, std::vector<sensordatareceiver::SensorData>>;
+        using SensorInput = std::variant<sensordatareceiver::SensorData, std::vector<sensordatareceiver::SensorData>, std::pair<bool, std::string>, std::pair<uint16_t, size_t>>;
         class ResponseEncoder : public IEvents{
             public:
             virtual void StartService();

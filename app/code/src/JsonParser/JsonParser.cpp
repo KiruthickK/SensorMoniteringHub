@@ -179,6 +179,30 @@ namespace sensormoniteringhub{
             return responseJson.dump();
         }
 
+        /// @brief method to form json from sensor status
+        /// @param pair 
+        /// @param reqData 
+        /// @return dumped string from the json
+        std::string JsonParser::SerializeResponseToTCPClientForGetSensorStatus(std::pair<bool, std::string> pair, clientrequestservice::RequestData const& reqData){
+            nlohmann::json responseJson;
+            responseJson["response_id"] = reqData.reqId_;
+            responseJson["sensor_status"] = (pair.first ? "active" : "inactive");
+            responseJson["ecu_name"] = pair.second;
+            return responseJson.dump();
+        }
+
+        /// @brief method to form json from the current stats
+        /// @param pair 
+        /// @param reqData 
+        /// @return 
+        std::string JsonParser::SerializeResponseToTCPClientForGetStats(std::pair<uint16_t, size_t> pair, clientrequestservice::RequestData const& reqData){
+            nlohmann::json responseJson;
+            responseJson["response_id"] = reqData.reqId_;
+            responseJson["current_sensor_data_received"] = pair.first;
+            responseJson["current_memory_used_int_bytes"] = pair.second;
+            return responseJson.dump();
+        }
+
         void JsonParser::Finalize()
         {
         }

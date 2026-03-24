@@ -25,6 +25,7 @@ namespace sensormoniteringhub{
             private:
             uint16_t portNumber_;
             uint16_t timeOutSeconds_;
+            std::string currentEcuName;
             int sock_{-1};
             std::thread udpReceiverThread_;
             std::thread udpReceivedDataHandleToSdrThread_;
@@ -49,6 +50,7 @@ namespace sensormoniteringhub{
             virtual void StopService();
             static void Initialize();
             static void Finalize();
+            std::pair<bool, std::string> GetSensorEcuStatus();
         };
     }
 }

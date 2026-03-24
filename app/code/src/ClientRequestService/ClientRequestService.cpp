@@ -129,12 +129,31 @@ namespace sensormoniteringhub{
             }
             case RequestType::GET_SENSOR_STATUS:
             {
-                // @todo
+                auto udpSensorReceiverInstance{
+                    std::dynamic_pointer_cast<networkinterfacemanager::UDPReceiver>(
+                        systemcontext::ComponentRegistry::GetComponent("UDPReceiver")
+                    )
+                };
+                if(udpSensorReceiverInstance){
+                    auto pair{udpSensorReceiverInstance->GetSensorEcuStatus()};
+                    if(pair.second.empty()){
+                        logger::Logger::LOG("RequestParser::ParseRequest", "No data available to respond", logger::LOGLEVEL::WARNING_LEVEL);
+                        return "-1";
+                    }
+                    responseStr = responseEncoder->EncodeResponseToString(pair, reqData);
+                }else{
+                    logger::Logger::LOG("RequestParser::ParseRequest", "UDP Receiver instance not available", logger::LOGLEVEL::ERROR_LEVEL);
+                }
                 break;
             }
             case RequestType::GET_STATS:
             {
-                // @todo
+                auto pair{dataPoolInstance->GetStats()};
+                if(pair.first == 0U || pair.second == 0U){
+                    logger::Logger::LOG("RequestParser::ParseRequest", "No data available to respond", logger::LOGLEVEL::WARNING_LEVEL);
+                    return "-1";
+                }
+                responseStr = responseEncoder->EncodeResponseToString(pair, reqData);
                 break;
             }
             case RequestType::GET_ZONES:

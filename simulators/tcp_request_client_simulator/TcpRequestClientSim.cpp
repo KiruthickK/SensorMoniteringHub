@@ -37,16 +37,20 @@ int main()
             "Enter 2 for GET_EVENTS with only timestamp\n"
             "Enter 3 for GET_EVENTS with only zone id\n" 
             "Enter 4 for GET_LATEST\n" 
+            "Enter 5 for GET_SENSOR_STATUS\n" 
+            "Enter 6 for GET_STATS\n" 
+            "Enter 7 for GET_ZONES\n" 
+            "Enter 100 for Invalid request\n" 
             "Enter -1 for exit" 
             << std::endl;
         std::cout << "Enter request (or quit): ";
         std::cin >> reqNo;
         nlohmann::json jsonReq;
+        jsonReq["request_id"] = ("RN" + std::to_string(reqId++));
         if (reqNo == -1)
             break;
         else{
             if(reqNo == 1 || reqNo == 2 || reqNo == 3){
-                jsonReq["request_id"] = ("RN" + std::to_string(reqId++));
                 jsonReq["request_type"] = "GET_EVENTS";
             }
             switch (reqNo){
@@ -84,9 +88,24 @@ int main()
                 break;
                 case 4:
                 {
-                    jsonReq["request_id"] = ("RN" + std::to_string(reqId++));
                     jsonReq["request_type"] = "GET_LATEST";
                 }
+                break;
+                case 5:
+                {
+                    jsonReq["request_type"] = "GET_SENSOR_STATUS";
+                }
+                break;
+                case 6:
+                {
+                    jsonReq["request_type"] = "GET_STATS";
+                }
+                break;
+                case 7:
+                {
+                    jsonReq["request_type"] = "GET_ZONES";
+                }
+                break;
             }
             if(reqNo == 1 || reqNo == 2 || reqNo == 3){
                 std::cout<<"Enter the limit you want to give for the output, -1 if you want all the results"<<std::endl;

@@ -8,6 +8,7 @@
 #include <ClientRequestService/RequestParser.hpp>
 #include <ClientRequestService/ResponseEncoder.hpp>
 #include <NetworkInterfaceManager/TCPReceiver.hpp>
+#include <NetworkInterfaceManager/UDPReceiver.hpp>
 #include <DataPool/DataPool.hpp>
 #include <Logger/Logger.hpp>
 

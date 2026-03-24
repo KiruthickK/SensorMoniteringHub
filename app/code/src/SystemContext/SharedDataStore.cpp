@@ -29,6 +29,12 @@ namespace sensormoniteringhub{
             logger::Logger::LOG("SharedDataStore::SetMaxEvent", "Max event set to: " + std::to_string(maxEvent));
         }
 
+        /// @brief getter method for sending max events
+        /// @return maxEvent_
+        uint16_t SharedDataStore::GetMaxEvent(){
+            return maxEvent_;
+        }
+
         /// @brief Sets the memory limit for the SharedDataStore.
         /// @param memoryType The type of memory to set the limit for.
         /// @param maxMemoryLimit The maximum limit for the specified memory type.
@@ -40,6 +46,12 @@ namespace sensormoniteringhub{
                 logger::Logger::LOG("SharedDataStore::SetMemoryLimit", "Invalid memory type. Using default 'mb'.", logger::LOGLEVEL::WARNING_LEVEL);
             }
             maxMemoryLimit_ = maxMemoryLimit;
+        }
+
+        /// @brief getter method for getting memorytype and memory limit
+        /// @return memoryType_, maxMemoryLimit_
+        std::pair<std::string, uint16_t> SharedDataStore::GetMemoryLimit(){
+            return {memoryType_, maxMemoryLimit_};
         }
 
         /// @brief Sets the details for the UDP Receiver.

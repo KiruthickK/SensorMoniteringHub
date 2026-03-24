@@ -40,6 +40,8 @@ namespace sensormoniteringhub{
             uint16_t GetUdpTimeOut();
             uint16_t GetTcpTimeOut();
             uint16_t GetTcpClientRequestServiceTimeOut();
+            uint16_t GetMaxEvent();
+            std::pair<std::string, uint16_t> GetMemoryLimit();
         };
     }
 }

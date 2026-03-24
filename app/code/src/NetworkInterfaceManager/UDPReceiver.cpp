@@ -120,7 +120,24 @@ namespace sensormoniteringhub{
         /// @return 
         bool UDPReceiver::IsHandshake(const std::string& msg)
         {
-            return msg.rfind("Hello from", 0) == 0;
+            bool result{false};
+            if(msg.rfind("Hello from", 0) == 0){
+                std::istringstream iss(msg);
+                std::vector<std::string> words(
+                    std::istream_iterator<std::string>{iss},
+                    std::istream_iterator<std::string>{}
+                );
+                /**
+                 * If the words sent for handshake 3 or more
+                 * the ECU client name will be the third word
+                 * Storing the currentECU name
+                 */
+                if(words.size() > 2){
+                    currentEcuName = words[2];
+                    result = true;
+                }
+            }
+            return result;
         }
 
         /// @brief helper method to send the reply back to the sender
@@ -196,14 +213,27 @@ namespace sensormoniteringhub{
             logger::Logger::LOG("UDPReceiver::Initialize", "Initialization successful!");
         }
 
+        /// @brief finalise method
         void UDPReceiver::Finalize()
         {
         }
+
+        /// @brief setter method for port number
+        /// @param portNumber 
         void UDPReceiver::setPortNumber(uint16_t portNumber){
             portNumber_ = portNumber;
         }
+        
+        /// @brief setter method for timeout
+        /// @param seconds 
         void UDPReceiver::setTimeoutSeconds(uint16_t seconds){
             timeOutSeconds_ = seconds;
+        }
+
+        /// @brief getter method for getting the current sensor ecu status
+        /// @return true if active sensor is present and name of the current udp sensor ecu which is the last connected one
+        std::pair<bool, std::string> UDPReceiver::GetSensorEcuStatus(){
+            return {hasActiveSender_, currentEcuName};
         }
     }
 }

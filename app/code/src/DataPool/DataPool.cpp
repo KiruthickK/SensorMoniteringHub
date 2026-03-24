@@ -2,8 +2,31 @@
 
 namespace sensormoniteringhub{
     namespace datapool{
+        DataPool::DataPool() : sensorDataSize(sizeof(sensordatareceiver::SensorData)) {}
         void DataPool::StartService()
         {
+            auto sharedDataStoreInstance{
+                std::dynamic_pointer_cast<systemcontext::SharedDataStore>(
+                    systemcontext::ComponentRegistry::GetComponent("SharedDataStore")
+                )
+            };
+            if(sharedDataStoreInstance){
+                auto pair{sharedDataStoreInstance->GetMemoryLimit()};
+                maxEvents_ = sharedDataStoreInstance->GetMaxEvent();
+                maxMemoryLimit_ = pair.second;
+                memoryType_ = pair.first;
+                /**
+                 * If the memory type is mb, then method to convert into bytes from mb will be mapped with
+                 * calculateSize function pointer, else kb method will be mapped
+                 * We are setting the max memory in terms of bytes, so it will be easy for updating every time
+                 */
+                std::function<size_t(uint16_t)> calculateSize = (!memoryType_.compare(std::string_view("mb")) 
+                                                                    ? MemoryConfig::FromMB : MemoryConfig::FromKB
+                                                                );
+                maxMemoryUsageBytes_.maxBytes = calculateSize(maxMemoryLimit_ * sensorDataSize);
+            }else{
+                logger::Logger::LOG("DataPool::StartService", "Shared Data store instance not available", logger::LOGLEVEL::ERROR_LEVEL);
+            }
         }
 
         void DataPool::StopService()
@@ -26,7 +49,40 @@ namespace sensormoniteringhub{
                 lastReceivedSensorData_ = sensorData;
             }
             std::lock_guard<std::mutex> lock(receivedSensorDataContainerMutex_);
-            receivedSensorDataContainer_.push_back(sensorData);
+            if(CheckSpaceAndEventStorageAvailability()){
+                receivedSensorDataContainer_.push_back(sensorData);
+                currentMemoryUsageBytes_ += sensorDataSize;
+                currEventCount_++;
+                logger::Logger::LOG("DataPool::WriteDataFromUDPSensorsToDataPool", "Sensor data write successful", logger::LOGLEVEL::DEBUG_LEVEL);
+            } else {
+                logger::Logger::LOG("DataPool::WriteDataFromUDPSensorsToDataPool", ((currEventCount_ >= maxEvents_) ? "Maximum sensor data received" : "Maximum Memory limit reached for storing sensor data"
+                                    ". Ignoring the Received sensor data"), logger::LOGLEVEL::ERROR_LEVEL);
+            }
+        }
+        
+        /// @brief pair<cur events count, current bytes usage>
+        /// @return currentEvent count and Current Memory usage in bytes
+        std::pair<uint16_t, size_t> DataPool::GetStats(){
+            std::pair<uint16_t, size_t> result;
+            {
+                std::lock_guard<std::mutex> lock(receivedSensorDataContainerMutex_);
+                result = {currEventCount_, currentMemoryUsageBytes_};
+            }
+            return result;
+        }
+
+        /// @brief method to calculate the space availablity
+        /// @return true if the new sensor data can be stored
+        bool DataPool::CheckSpaceAndEventStorageAvailability(){
+            bool result{false};
+            /**
+             * No need to acquire lock again. In WriteDataFromUDPSensorsToDataPool method, lock is 
+             * already aquired before calling this helper method.
+             */
+            if(((currEventCount_ + 1) < maxEvents_) && ((currentMemoryUsageBytes_ + sensorDataSize) < maxMemoryUsageBytes_.maxBytes)){
+                result = true;
+            }
+            return result;
         }
 
         /// @brief method for fetching results for the query "GET_EVENTS" based on zone_id and timestamp

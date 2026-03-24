@@ -44,6 +44,14 @@ namespace sensormoniteringhub{
                         return;
                     }
                     encodedString = jsonParserInstance->SerializeResponseToTCPClientForGetLatest(resData, reqData);
+                } else if constexpr(std::is_same_v<std::decay_t<decltype(resData)>,std::pair<bool, std::string>>){
+                    if(resData.second.empty()){
+                        logger::Logger::LOG("ResponseEncoder::EncodeResponseToString", "responseData is empty", logger::LOGLEVEL::ERROR_LEVEL);
+                        return;
+                    }
+                    encodedString = jsonParserInstance->SerializeResponseToTCPClientForGetSensorStatus(resData, reqData);
+                } else if constexpr(std::is_same_v<std::decay_t<decltype(resData)>, std::pair<uint16_t, size_t>>){
+                    encodedString = jsonParserInstance->SerializeResponseToTCPClientForGetStats(resData, reqData);
                 }
             }, responseData);
             return encodedString;
