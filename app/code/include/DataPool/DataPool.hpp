@@ -17,8 +17,8 @@ namespace sensormoniteringhub{
         /// @brief store config limit always in bytes internally and convert at the boundary (when reading config)
         struct MemoryConfig {
             size_t maxBytes;
-            static size_t FromKB(uint16_t kb) { return kb * 1024; }
-            static size_t FromMB(uint16_t mb) { return mb * 1024 * 1024; }
+            static size_t FromKB(uint16_t kb) { return static_cast<size_t>(kb) * 1024; }
+            static size_t FromMB(uint16_t mb) { return static_cast<size_t>(mb) * 1024 * 1024; }
         };
         class DataPool : public IEvents{
             private:

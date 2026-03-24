@@ -45,6 +45,7 @@ namespace sensormoniteringhub{
                 memoryType_ = "mb";
                 logger::Logger::LOG("SharedDataStore::SetMemoryLimit", "Invalid memory type. Using default 'mb'.", logger::LOGLEVEL::WARNING_LEVEL);
             }
+            logger::Logger::LOG("SharedDataStore::SetMemoryLimit", "Memory config:- MemoryType: "+memoryType+"; MemoryLimit: "+std::to_string(maxMemoryLimit), logger::LOGLEVEL::DEBUG_LEVEL);
             maxMemoryLimit_ = maxMemoryLimit;
         }
 

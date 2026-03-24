@@ -20,10 +20,14 @@ namespace sensormoniteringhub{
                  * calculateSize function pointer, else kb method will be mapped
                  * We are setting the max memory in terms of bytes, so it will be easy for updating every time
                  */
-                std::function<size_t(uint16_t)> calculateSize = (!memoryType_.compare(std::string_view("mb")) 
-                                                                    ? MemoryConfig::FromMB : MemoryConfig::FromKB
+                std::function<size_t(uint16_t)> calculateSize = (!memoryType_.compare("mb") 
+                                                                    ? std::function<size_t(uint16_t)>(MemoryConfig::FromMB) 
+                                                                    : std::function<size_t(uint16_t)>(MemoryConfig::FromKB)
                                                                 );
+                logger::Logger::LOG("DataPool::StartService", "Memory config ["+memoryType_+":"+std::to_string(maxMemoryLimit_)+"]", logger::LOGLEVEL::DEBUG_LEVEL);
+                logger::Logger::LOG("DataPool::StartService", "sensor data size in bytes ["+std::to_string(sensorDataSize)+"]", logger::LOGLEVEL::DEBUG_LEVEL);
                 maxMemoryUsageBytes_.maxBytes = calculateSize(maxMemoryLimit_ * sensorDataSize);
+                logger::Logger::LOG("DataPool::StartService", "Calculated Max memory bytes ["+std::to_string(maxMemoryUsageBytes_.maxBytes)+"]", logger::LOGLEVEL::DEBUG_LEVEL);
             }else{
                 logger::Logger::LOG("DataPool::StartService", "Shared Data store instance not available", logger::LOGLEVEL::ERROR_LEVEL);
             }
@@ -57,6 +61,8 @@ namespace sensormoniteringhub{
             } else {
                 logger::Logger::LOG("DataPool::WriteDataFromUDPSensorsToDataPool", ((currEventCount_ >= maxEvents_) ? "Maximum sensor data received" : "Maximum Memory limit reached for storing sensor data"
                                     ". Ignoring the Received sensor data"), logger::LOGLEVEL::ERROR_LEVEL);
+                logger::Logger::LOG("DataPool::WriteDataFromUDPSensorsToDataPool", "Used memory: "+std::to_string(currentMemoryUsageBytes_)+"; Max memory: "+std::to_string(maxMemoryUsageBytes_.maxBytes)
+                                    , logger::LOGLEVEL::ERROR_LEVEL);
             }
         }
         

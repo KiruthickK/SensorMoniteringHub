@@ -44,7 +44,7 @@ namespace sensormoniteringhub{
                     maxMemoryLimit = config.at("memoryLimit").at("maxMemoryLimit");
                     logger::Logger::LOG("ConfigParser::LoadConfigs", "Loaded maxMemoryLimit; value=["+std::to_string(maxMemoryLimit)+"]");
                 }
-                if(memoryType != "" && maxMemoryLimit != 0U){
+                if(!memoryType.empty() && maxMemoryLimit != 0U){
                     SharedDataStoreInstance->SetMemoryLimit(memoryType, maxMemoryLimit);
                 }else{
                     SharedDataStoreInstance->SetMemoryLimit("mb", 1024); // setting default value in case of failure
