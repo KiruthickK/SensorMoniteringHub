@@ -55,6 +55,7 @@ namespace sensormoniteringhub{
             std::lock_guard<std::mutex> lock(receivedSensorDataContainerMutex_);
             if(CheckSpaceAndEventStorageAvailability()){
                 receivedSensorDataContainer_.push_back(sensorData);
+                uniqueZoneIds_.insert(sensorData.zoneId_);
                 currentMemoryUsageBytes_ += sensorDataSize;
                 currEventCount_++;
                 logger::Logger::LOG("DataPool::WriteDataFromUDPSensorsToDataPool", "Sensor data write successful", logger::LOGLEVEL::DEBUG_LEVEL);
@@ -75,6 +76,12 @@ namespace sensormoniteringhub{
                 result = {currEventCount_, currentMemoryUsageBytes_};
             }
             return result;
+        }
+
+        /// @brief getter method for getting unique zone ids
+        /// @return uniqueZoneIds_
+        std::set<std::string> DataPool::getUniqueZones(){
+            return uniqueZoneIds_;
         }
 
         /// @brief method to calculate the space availablity

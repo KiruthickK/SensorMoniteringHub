@@ -7,10 +7,11 @@
 #include <ClientRequestService/RequestData.hpp>
 #include <JsonParser/JsonParser.hpp>
 #include <variant>
+#include <set>
 
 namespace sensormoniteringhub{
     namespace clientrequestservice{
-        using SensorInput = std::variant<sensordatareceiver::SensorData, std::vector<sensordatareceiver::SensorData>, std::pair<bool, std::string>, std::pair<uint16_t, size_t>>;
+        using SensorInput = std::variant<sensordatareceiver::SensorData, std::vector<sensordatareceiver::SensorData>, std::pair<bool, std::string>, std::pair<uint16_t, size_t>, std::set<std::string>>;
         class ResponseEncoder : public IEvents{
             public:
             virtual void StartService();

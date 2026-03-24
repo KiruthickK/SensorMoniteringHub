@@ -7,7 +7,7 @@
 #include <Logger/Logger.hpp>
 #include <SensorDataReceiver/SensorData.hpp>
 #include <ClientRequestService/RequestData.hpp>
-
+#include <set>
 
 namespace sensormoniteringhub{
     namespace jsonparser{
@@ -24,6 +24,7 @@ namespace sensormoniteringhub{
             std::string SerializeResponseToTCPClientForGetLatest(sensordatareceiver::SensorData const& sensorDataContainer, clientrequestservice::RequestData const& reqData);
             std::string SerializeResponseToTCPClientForGetSensorStatus(std::pair<bool, std::string>, clientrequestservice::RequestData const& reqData);
             std::string SerializeResponseToTCPClientForGetStats(std::pair<uint16_t, size_t>, clientrequestservice::RequestData const& reqData);
+            std::string SerializeResponseToTCPClientForGetZones(std::set<std::string>, clientrequestservice::RequestData const& reqData);
         };
     }
 }

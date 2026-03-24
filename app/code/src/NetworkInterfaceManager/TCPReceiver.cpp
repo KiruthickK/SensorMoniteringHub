@@ -116,7 +116,6 @@ namespace sensormoniteringhub{
                         logger::Logger::LOG("TCPReceiver::HandleCurrentClient","Received Request string: "+request, logger::LOGLEVEL::DEBUG_LEVEL);
                         std::string response;
                         response = clientRequestServiceInstance->HandleRequest(request);
-                        // ProcessRequest(request, response); // call the clientRequestService for the response @todo
                         response += "\n";
                         // sending response // @todo
                         size_t totalSent = 0;
@@ -138,7 +137,7 @@ namespace sensormoniteringhub{
                 // case when the current client disconnected
                 else if (bytes == 0)
                 {
-                    std::cout << "Client disconnected\n";
+                    logger::Logger::LOG("TCPReceiver::HandleCurrentClient","Client disconnected");
                     break;
                 }
                 // case when there's no request received with 1 sec interval
@@ -161,13 +160,12 @@ namespace sensormoniteringhub{
                     }
                     else
                     {
-                        std::cout << "Recv error\n";
+                        logger::Logger::LOG("TCPReceiver::HandleCurrentClient","Recv error", logger::LOGLEVEL::ERROR_LEVEL);
                         break;
                     }
                 }
             }
-
-            std::cout << "Closing client socket\n";
+            logger::Logger::LOG("TCPReceiver::HandleCurrentClient","Closing client socket");
             close(clientSocket);
         }
     }

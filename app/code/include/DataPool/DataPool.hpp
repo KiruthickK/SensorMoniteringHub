@@ -31,6 +31,7 @@ namespace sensormoniteringhub{
             std::string memoryType_;
             sensordatareceiver::SensorData lastReceivedSensorData_;
             std::vector<sensordatareceiver::SensorData> receivedSensorDataContainer_;
+            std::set<std::string> uniqueZoneIds_;
             std::mutex receivedSensorDataContainerMutex_;
             bool CheckSpaceAndEventStorageAvailability();
             public:
@@ -44,6 +45,7 @@ namespace sensormoniteringhub{
             [[nodiscard]] bool GetLastReceivedData(sensordatareceiver::SensorData& sensorData);
             /// @brief pair<cur events count, current bytes usage>
             std::pair<uint16_t, size_t> GetStats();
+            std::set<std::string> getUniqueZones();
         };
     }
 }

@@ -158,12 +158,18 @@ namespace sensormoniteringhub{
             }
             case RequestType::GET_ZONES:
             {
-                // @todo
+                auto uniqueZoneIds{dataPoolInstance->getUniqueZones()};
+                if(!uniqueZoneIds.empty()){
+                    responseStr = responseEncoder->EncodeResponseToString(uniqueZoneIds, reqData);
+                }else{
+                    logger::Logger::LOG("RequestParser::ParseRequest", "No data available to respond", logger::LOGLEVEL::WARNING_LEVEL);
+                    return "-1";
+                }
                 break;
             }
             default:
                 logger::Logger::LOG("RequestParser::ParseRequest", "UNKNOWN request type", logger::LOGLEVEL::ERROR_LEVEL);
-                // return false;
+                return "-1";
                 break;
             }
             return responseStr;

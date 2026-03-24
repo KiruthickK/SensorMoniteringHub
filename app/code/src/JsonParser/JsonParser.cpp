@@ -203,6 +203,17 @@ namespace sensormoniteringhub{
             return responseJson.dump();
         }
 
+        /// @brief method for forming JSON from set of zones we received from udp sensor data
+        /// @param zones 
+        /// @param reqData 
+        /// @return 
+        std::string JsonParser::SerializeResponseToTCPClientForGetZones(std::set<std::string> zones, clientrequestservice::RequestData const& reqData){
+            nlohmann::json responseJson;
+            responseJson["response_id"] = reqData.reqId_;
+            responseJson["zones"] = zones; // set will automatically converted to JSON array
+            return responseJson.dump();
+        }
+
         void JsonParser::Finalize()
         {
         }
