@@ -1,0 +1,9 @@
+{
+  "sensor_id": "MOTION_4",
+  "timestamp": 1719230035,
+  "motion_detected": true,
+  "motion_intensity": 0.78,
+  "temperature": 31.4,
+  "battery_level": 82,
+  "zone_id": "HALL"
+}

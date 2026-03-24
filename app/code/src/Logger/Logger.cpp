@@ -13,6 +13,7 @@ namespace sensormoniteringhub{
                     LOG("Logger::StartService", "Failed to open file!", logger::LOGLEVEL::ERROR_LEVEL);
                     return;
                 }
+                // thread will write all the logs before terminating the application
                 while(!StopLoggingThread_.load() || !LogMessageQueue_.empty()){
                     std::string curMessage{""};
                     {
@@ -37,6 +38,7 @@ namespace sensormoniteringhub{
         void Logger::StopService()
         {
             StopLoggingThread_.store(true);
+            LogQueuePushNotifierCV_.notify_one();
             if(LogsFileEntryThread_.joinable()){
                 LogsFileEntryThread_.join();
             }
@@ -59,7 +61,7 @@ namespace sensormoniteringhub{
         /// @param metaData 
         /// @param str 
         /// @param level 
-        void Logger::LOG(std::string metaData, std::string str, LOGLEVEL level)
+        void Logger::LOG(std::string metaData, std::string str, LOGLEVEL level, int errCode)
         {
             std::string message{"["+metaData+"] "+str};
             if(LoggerInstance_ == nullptr){

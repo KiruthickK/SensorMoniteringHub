@@ -3,6 +3,8 @@
 #include <Events/IEvents.hpp>
 #include <SystemContext/ComponentRegistry.hpp>
 #include <Logger/Logger.hpp>
+#include <chrono>
+#include <cstdint>
 
 namespace sensormoniteringhub{
     namespace timerservice{
@@ -12,6 +14,8 @@ namespace sensormoniteringhub{
             virtual void StopService();
             static void Initialize();
             static void Finalize();
+            uint64_t GetCurrentTimestamp();
+            uint64_t GetElapsedSeconds(uint64_t pastTimestamp);
         };
     }
 }
