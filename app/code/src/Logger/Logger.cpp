@@ -7,10 +7,16 @@ namespace sensormoniteringhub{
         {
             std::string filename = generateFileName();
             LogsFileEntryThread_ = std::thread([this, filename](){
-                std::ofstream file("../logs/" + filename, std::ios::app);
+                std::error_code ec;
+                std::filesystem::create_directories("../logs", ec);
+                if(ec){
+                    Logger::LOG("Logger::StartService", "Failed to create directory!", logger::LOGLEVEL::ERROR_LEVEL);
+                    return;
+                }
+                std::ofstream file("../logs/"+ filename, std::ios::app);
                 if (!file)
                 {
-                    LOG("Logger::StartService", "Failed to open file!", logger::LOGLEVEL::ERROR_LEVEL);
+                    Logger::LOG("Logger::StartService", "Failed to open file!", logger::LOGLEVEL::ERROR_LEVEL);
                     return;
                 }
                 // thread will write all the logs before terminating the application
