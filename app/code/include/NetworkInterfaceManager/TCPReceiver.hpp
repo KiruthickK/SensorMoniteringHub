@@ -2,8 +2,10 @@
 #define TCPRECEIVER_HEADER
 #include <Events/IEvents.hpp>
 #include <SystemContext/ComponentRegistry.hpp>
+#include <SystemContext/SharedDataStore.hpp>
 #include <ClientRequestService/ClientRequestService.hpp>
 #include <Logger/Logger.hpp>
+#include <ControlCommandService/ControlCommandService.hpp>
 #include <iostream>
 #include <thread>
 #include <atomic>
@@ -18,10 +20,17 @@ namespace sensormoniteringhub{
         class TCPReceiver : public IEvents{
             private:
             std::thread tcpClientRequestServiceReceiverThread_;
+            std::thread tcpControlClientReceiverThread_;
             std::atomic<bool> tcpClientRequestServiceReceiverStopSignal_;
+            std::atomic<bool> tcpControlClientReceiverStopSignal_;
             int tcpClientReceiverServiceSocket_;
+            int tcpControlClientSocket_;
+            uint16_t controlClientPortNumber_;
+            uint16_t controlClientTimeOutSeconds_;
             void TcpReceiverLoopForClientRequestService(int const clientRequestServiceSock, uint16_t const timeOut);
-            void HandleCurrentClient(int clientSocket);
+            void TcpReceiverLoopForControlClient();
+            void HandleCurrentRequestClient(int clientSocket);
+            void HandleCurrentControlClient(int clientSocket);
             public:
             virtual void StartService();
             virtual void StopService();

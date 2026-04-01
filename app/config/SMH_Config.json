@@ -8,7 +8,7 @@
         "portNumber" : 8080,
         "timeOut" : 15
     },
-    "tcpReceiverDetails" : {
+    "tcpOrderReceiverDetails" : {
         "portNumber" : 8090,
         "timeOut" : 15
     },

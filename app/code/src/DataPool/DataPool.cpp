@@ -81,7 +81,12 @@ namespace sensormoniteringhub{
         /// @brief getter method for getting unique zone ids
         /// @return uniqueZoneIds_
         std::set<std::string> DataPool::getUniqueZones(){
-            return uniqueZoneIds_;
+            std::set<std::string> result;
+            {
+                std::lock_guard<std::mutex> lock(receivedSensorDataContainerMutex_);
+                result = uniqueZoneIds_;
+            }
+            return result;
         }
 
         /// @brief method to calculate the space availablity
@@ -157,7 +162,7 @@ namespace sensormoniteringhub{
                     logger::Logger::LOG("DataPool::GetLastReceivedData", "No data available", logger::LOGLEVEL::WARNING_LEVEL);
                     return false;
                 }
-            sensorData = lastReceivedSensorData_;
+                sensorData = lastReceivedSensorData_;
             }
             return true;
         }

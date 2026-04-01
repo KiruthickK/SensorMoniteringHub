@@ -20,6 +20,9 @@
 #include <ClientRequestService/ClientRequestService.hpp>
 #include <ClientRequestService/RequestParser.hpp>
 #include <ClientRequestService/ResponseEncoder.hpp>
+#include <ControlCommandService/CommandParser.hpp>
+#include <ControlCommandService/CommandResponseEncoder.hpp>
+#include <ControlCommandService/ControlCommandService.hpp>
 #include <TimerService/TimerService.hpp>
 
 namespace sensormoniteringhub{

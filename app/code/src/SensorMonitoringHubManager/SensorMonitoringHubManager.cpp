@@ -36,6 +36,9 @@ namespace sensormoniteringhub{
             clientrequestservice::ClientRequestService::Initialize();
             clientrequestservice::RequestParser::Initialize();
             clientrequestservice::ResponseEncoder::Initialize();
+            controlcommandservice::ControlCommandService::Initialize();
+            controlcommandservice::CommandParser::Initialize();
+            controlcommandservice::CommandResponseEncoder::Initialize();
             timerservice::TimerService::Initialize();
             logger::Logger::LOG("SensorMonitoringHubManager::Initialize", "All components Initialized");
         }
@@ -48,6 +51,9 @@ namespace sensormoniteringhub{
             clientrequestservice::ResponseEncoder::Finalize();
             clientrequestservice::RequestParser::Finalize();
             clientrequestservice::ClientRequestService::Finalize();
+            controlcommandservice::CommandResponseEncoder::Finalize();
+            controlcommandservice::CommandParser::Finalize();    
+            controlcommandservice::ControlCommandService::Finalize();
             jsonparser::JsonParser::Finalize();
             datapool::DataPool::Finalize();
             sensordatareceiver::SensorDataReceiver::Finalize();

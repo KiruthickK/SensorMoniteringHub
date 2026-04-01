@@ -71,25 +71,25 @@ namespace sensormoniteringhub{
                     SharedDataStoreInstance->SetUdpReceiverDetails(8080, 30); // setting default value in case of failure
                 }
             }
-            if(config.contains("tcpReceiverDetails") && config.at("tcpReceiverDetails").is_object()){
+            if(config.contains("tcpOrderReceiverDetails") && config.at("tcpOrderReceiverDetails").is_object()){
                 uint16_t tcpPortNumber{0U};
                 uint16_t tcptimeOut{0U};
-                if(config.at("tcpReceiverDetails").contains("portNumber")
-                    && config.at("tcpReceiverDetails").at("portNumber").is_number()
+                if(config.at("tcpOrderReceiverDetails").contains("portNumber")
+                    && config.at("tcpOrderReceiverDetails").at("portNumber").is_number()
                 ){
-                    tcpPortNumber = config.at("tcpReceiverDetails").at("portNumber");
+                    tcpPortNumber = config.at("tcpOrderReceiverDetails").at("portNumber");
                     logger::Logger::LOG("ConfigParser::LoadConfigs", "Loaded tcpPortNumber; value=["+std::to_string(tcpPortNumber)+"]");
                 }
-                if(config.at("tcpReceiverDetails").contains("timeOut")
-                    && config.at("tcpReceiverDetails").at("timeOut").is_number()
+                if(config.at("tcpOrderReceiverDetails").contains("timeOut")
+                    && config.at("tcpOrderReceiverDetails").at("timeOut").is_number()
                 ){
-                    tcptimeOut = config.at("tcpReceiverDetails").at("timeOut");
+                    tcptimeOut = config.at("tcpOrderReceiverDetails").at("timeOut");
                     logger::Logger::LOG("ConfigParser::LoadConfigs", "Loaded tcptimeOut; value=["+std::to_string(tcptimeOut)+"]");
                 }
                 if(tcpPortNumber != 0U && tcptimeOut != 0U){
-                    SharedDataStoreInstance->SetTcpReceiverDetails(tcpPortNumber, tcptimeOut);
+                    SharedDataStoreInstance->SetTcpOrderReceiverDetails(tcpPortNumber, tcptimeOut);
                 }else{
-                    SharedDataStoreInstance->SetTcpReceiverDetails(8090, 30); // setting default value in case of failure
+                    SharedDataStoreInstance->SetTcpOrderReceiverDetails(8090, 30); // setting default value in case of failure
                 }
             }
             if(config.contains("tcpClientRequestServiceDetails") && config.at("tcpClientRequestServiceDetails").is_object()){
@@ -130,7 +130,7 @@ namespace sensormoniteringhub{
             SharedDataStoreInstance->SetMaxEvent(10000);
             SharedDataStoreInstance->SetMemoryLimit("mb", 1024);
             SharedDataStoreInstance->SetUdpReceiverDetails(8080, 30);
-            SharedDataStoreInstance->SetTcpReceiverDetails(8090, 30);
+            SharedDataStoreInstance->SetTcpOrderReceiverDetails(8090, 30);
             SharedDataStoreInstance->SetTcpClientRequestServiceDetails(9090, 30);
             logger::Logger::LOG("ConfigParser::SetDefaultConfigs", "Default configs set: maxEvents=10000, memoryType=mb, maxMemoryLimit=1024, udpPortNumber=8080, udptimeOut=30, tcpPortNumber=9090, tcptimeOut=30");
         }
