@@ -30,7 +30,7 @@ namespace sensormoniteringhub{
             catch(const std::exception& e)
             {
                 logger::Logger::LOG("SensorDataReceiver::ProcessReceivedUdpData", e.what(), logger::LOGLEVEL::ERROR_LEVEL);
-                return {};
+                return nullptr;
             }
             return parsedJson_;
         }
@@ -128,6 +128,27 @@ namespace sensormoniteringhub{
             }
             if(parsedJson.contains("limit") && parsedJson.at("limit").is_number()){
                 data.limit_= parsedJson.at("limit");
+            }
+            return true;
+        }
+
+        bool JsonParser::ParseCommandFromTCPClient(std::string const& jsonString, controlcommandservice::CommandOrderInformation& data){
+            nlohmann::json parsedJson = ParseJsonFromString(jsonString);
+            if(parsedJson.is_null()){
+                logger::Logger::LOG("JsonParser::ParseCommandFromTCPClient", "Received empty JSON", logger::LOGLEVEL::WARNING_LEVEL);
+                return false;
+            }
+            if(parsedJson.contains("order_id") && parsedJson.at("order_id").is_string()){
+                data.orderId_ = parsedJson.at("order_id");
+            }else{
+                logger::Logger::LOG("JsonParser::ParseCommandFromTCPClient", "OrderId is not present in the JSON", logger::LOGLEVEL::WARNING_LEVEL);
+                return false;
+            }
+            if(parsedJson.contains("order_type") && parsedJson.at("order_type").is_string()){
+                data.type_ = controlcommandservice::GetCommandType(parsedJson.at("order_type"));
+            }else{
+                logger::Logger::LOG("JsonParser::ParseCommandFromTCPClient", "OrderType is not present in the JSON", logger::LOGLEVEL::WARNING_LEVEL);
+                return false;
             }
             return true;
         }

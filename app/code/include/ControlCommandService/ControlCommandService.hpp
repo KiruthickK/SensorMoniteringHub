@@ -3,6 +3,9 @@
 
 #include <Events/IEvents.hpp>
 #include <Logger/Logger.hpp>
+#include <ControlCommandService/CommandParser.hpp>
+#include <ControlCommandService/CommandResponseEncoder.hpp>
+#include <ControlCommandService/CommandOrderInformation.hpp>
 #include <iostream>
 
 namespace sensormoniteringhub{
