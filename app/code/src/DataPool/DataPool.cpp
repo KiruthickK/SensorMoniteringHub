@@ -80,8 +80,17 @@ namespace sensormoniteringhub{
 
         /// @brief getter method for getting unique zone ids
         /// @return uniqueZoneIds_
-        std::set<std::string> DataPool::getUniqueZones(){
-            return uniqueZoneIds_;
+        std::set<std::string> DataPool::GetUniqueZones(){
+            std::set<std::string> result;
+            {
+                if(uniqueZoneIds_.empty()){
+                    logger::Logger::LOG("DataPool::GetUniqueZones", "No zone ids present!", logger::LOGLEVEL::WARNING_LEVEL);
+                    return {};
+                }
+                std::lock_guard<std::mutex> lock(receivedSensorDataContainerMutex_);
+                result = uniqueZoneIds_;
+            }
+            return result;
         }
 
         /// @brief method to calculate the space availablity
@@ -157,7 +166,26 @@ namespace sensormoniteringhub{
                     logger::Logger::LOG("DataPool::GetLastReceivedData", "No data available", logger::LOGLEVEL::WARNING_LEVEL);
                     return false;
                 }
-            sensorData = lastReceivedSensorData_;
+                sensorData = lastReceivedSensorData_;
+            }
+            return true;
+        }
+
+        /// @brief method for clearing the events
+        /// @return true if data is cleared
+        bool DataPool::ClearEvents(){
+            std::lock_guard<std::mutex> lock(receivedSensorDataContainerMutex_);
+            {
+                if(currEventCount_ == 0U){
+                    logger::Logger::LOG("DataPool::ClearEvents", "There is no Events to clear", logger::LOGLEVEL::WARNING_LEVEL);
+                    return false;
+                }
+                lastReceivedSensorData_ = {};
+                receivedSensorDataContainer_.clear();
+                currEventCount_ = 0U;
+                currentMemoryUsageBytes_ = 0U;
+                uniqueZoneIds_.clear();
+                logger::Logger::LOG("DataPool::ClearEvents", "Stored Events cleared successfully!");
             }
             return true;
         }

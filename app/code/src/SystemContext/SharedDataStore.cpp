@@ -6,10 +6,28 @@ namespace sensormoniteringhub{
         {
         }
 
+        /// @brief method for stopping the service
         void SharedDataStore::StopService()
         {
+            logger::Logger::LOG("SharedDataStore::StopService", "Executing stop service!" );
+            ClearData();
         }
 
+        /// @brief method for clearing the config data members before stopping service
+        void SharedDataStore::ClearData(){
+            logger::Logger::LOG("SharedDataStore::ClearData", "Clearing the stored data!" );
+            maxEvent_ = 0U;
+            currEventCount_= 0U;
+            maxMemoryLimit_= 0U;
+            currMemoryUsage_= 0U;
+            memoryType_ = "";
+            udpPortNumber_= 0U;
+            udptimeOut_= 0U;
+            tcpPortNumber_= 0U;
+            tcptimeOut_= 0U;
+            tcpClientRequestServicePortNumber_= 0U;
+            tcpClientRequestServicetimeOut_= 0U;            
+        }
         void SharedDataStore::Initialize()
         {
             std::dynamic_pointer_cast<systemcontext::ComponentRegistry>(
@@ -67,10 +85,10 @@ namespace sensormoniteringhub{
         /// @brief Sets the details for the TCP Receiver.
         /// @param portNumber The port number for the TCP Receiver.
         /// @param timeOut The timeout value for the TCP Receiver.
-        void SharedDataStore::SetTcpReceiverDetails(uint16_t portNumber, uint16_t timeOut){
+        void SharedDataStore::SetTcpOrderReceiverDetails(uint16_t portNumber, uint16_t timeOut){
             tcpPortNumber_ = portNumber;
             tcptimeOut_ = timeOut;
-            logger::Logger::LOG("SharedDataStore::SetTcpReceiverDetails", "TCP Receiver details set: Port - " + std::to_string(portNumber) + ", Timeout - " + std::to_string(timeOut) + "ms");
+            logger::Logger::LOG("SharedDataStore::SetTcpOrderReceiverDetails", "TCP Receiver details set: Port - " + std::to_string(portNumber) + ", Timeout - " + std::to_string(timeOut) + "ms");
         }
 
         /// @brief sets the details for the TCP ClientRequestService

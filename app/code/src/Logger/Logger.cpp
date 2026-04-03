@@ -5,6 +5,10 @@ namespace sensormoniteringhub{
         std::shared_ptr<Logger> Logger::LoggerInstance_ = nullptr;
         void Logger::StartService()
         {
+            if(LogsFileEntryThread_.joinable()){
+                std::cerr << "[Logger::StartService] Logger already started, ignoring repeated start request" << std::endl;
+                return;
+            }
             std::string filename = generateFileName();
             LogsFileEntryThread_ = std::thread([this, filename](){
                 std::error_code ec;
@@ -90,6 +94,11 @@ namespace sensormoniteringhub{
             case LOGLEVEL::WARNING_LEVEL:
                 message = "[WARNING!]" + message;
                 std::cerr << YELLOW << message << RESET << std::endl;
+                break;
+            case LOGLEVEL::LIFECYCLE_LEVEL:
+                message = "[LIFECYCLE]" + message;
+                std::cout << CYAN << message << RESET << std::endl;
+                break;
             default:
                 break;
             }
@@ -104,6 +113,9 @@ namespace sensormoniteringhub{
         /// @return A string representing the generated log file name.
         std::string Logger::generateFileName()
         {
+            if(!GeneratedLogFileName.empty()){
+                return GeneratedLogFileName; // reusing the same log file name, in case of app service restart
+            }
             auto now = std::chrono::system_clock::now();
             std::time_t now_c = std::chrono::system_clock::to_time_t(now);
 
@@ -115,7 +127,7 @@ namespace sensormoniteringhub{
                     << std::put_time(timeInfo, "%b-%d-%HHrs-%MMins")
                     << ".txt";
 
-            return filename.str();
+            return GeneratedLogFileName = filename.str();
         }
     }
 }

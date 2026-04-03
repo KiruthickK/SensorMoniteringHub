@@ -2,6 +2,32 @@
 
 namespace sensormoniteringhub{
     namespace jsonparser{
+        std::string ConfigParser::configPath_{""};
+
+        void ConfigParser::StartService()
+        {
+
+        }
+
+        void ConfigParser::StopService()
+        {
+        }
+
+        /// @brief method for initialization
+        void ConfigParser::Initialize()
+        {
+            std::dynamic_pointer_cast<systemcontext::ComponentRegistry>(
+                systemcontext::ComponentRegistry::GetComponent("ComponentRegistry")
+            )->RegisterComponent("ConfigParser", std::make_shared<ConfigParser>());
+            logger::Logger::LOG("ConfigParser::Initialize", "Initialization successful!");
+        }
+        void ConfigParser::Finalize(){
+
+        }
+
+        /// @brief method for loading the config files
+        /// @param configPath 
+        /// @return true if parsing is success
         bool ConfigParser::LoadConfigs(std::string const& configPath)
         {
             auto SharedDataStoreInstance{
@@ -16,6 +42,7 @@ namespace sensormoniteringhub{
             logger::Logger::LOG("ConfigParser::LoadConfigs", "Started loading config files");
             logger::Logger::LOG("ConfigParser::LoadConfigs", "Config File path: " + configPath);
             std::ifstream file(configPath);
+            configPath_ = configPath;
             if (!file.is_open()) {
                 logger::Logger::LOG("ConfigParser::LoadConfigs", "Failed to open JSON file", logger::LOGLEVEL::ERROR_LEVEL);
                 return false;
@@ -71,25 +98,25 @@ namespace sensormoniteringhub{
                     SharedDataStoreInstance->SetUdpReceiverDetails(8080, 30); // setting default value in case of failure
                 }
             }
-            if(config.contains("tcpReceiverDetails") && config.at("tcpReceiverDetails").is_object()){
+            if(config.contains("tcpOrderReceiverDetails") && config.at("tcpOrderReceiverDetails").is_object()){
                 uint16_t tcpPortNumber{0U};
                 uint16_t tcptimeOut{0U};
-                if(config.at("tcpReceiverDetails").contains("portNumber")
-                    && config.at("tcpReceiverDetails").at("portNumber").is_number()
+                if(config.at("tcpOrderReceiverDetails").contains("portNumber")
+                    && config.at("tcpOrderReceiverDetails").at("portNumber").is_number()
                 ){
-                    tcpPortNumber = config.at("tcpReceiverDetails").at("portNumber");
+                    tcpPortNumber = config.at("tcpOrderReceiverDetails").at("portNumber");
                     logger::Logger::LOG("ConfigParser::LoadConfigs", "Loaded tcpPortNumber; value=["+std::to_string(tcpPortNumber)+"]");
                 }
-                if(config.at("tcpReceiverDetails").contains("timeOut")
-                    && config.at("tcpReceiverDetails").at("timeOut").is_number()
+                if(config.at("tcpOrderReceiverDetails").contains("timeOut")
+                    && config.at("tcpOrderReceiverDetails").at("timeOut").is_number()
                 ){
-                    tcptimeOut = config.at("tcpReceiverDetails").at("timeOut");
+                    tcptimeOut = config.at("tcpOrderReceiverDetails").at("timeOut");
                     logger::Logger::LOG("ConfigParser::LoadConfigs", "Loaded tcptimeOut; value=["+std::to_string(tcptimeOut)+"]");
                 }
                 if(tcpPortNumber != 0U && tcptimeOut != 0U){
-                    SharedDataStoreInstance->SetTcpReceiverDetails(tcpPortNumber, tcptimeOut);
+                    SharedDataStoreInstance->SetTcpOrderReceiverDetails(tcpPortNumber, tcptimeOut);
                 }else{
-                    SharedDataStoreInstance->SetTcpReceiverDetails(8090, 30); // setting default value in case of failure
+                    SharedDataStoreInstance->SetTcpOrderReceiverDetails(8090, 30); // setting default value in case of failure
                 }
             }
             if(config.contains("tcpClientRequestServiceDetails") && config.at("tcpClientRequestServiceDetails").is_object()){
@@ -116,6 +143,7 @@ namespace sensormoniteringhub{
             return true;
         }
         
+        /// @brief method for setting default config files
         void ConfigParser::SetDefaultConfigs()
         {
             auto SharedDataStoreInstance{
@@ -130,9 +158,51 @@ namespace sensormoniteringhub{
             SharedDataStoreInstance->SetMaxEvent(10000);
             SharedDataStoreInstance->SetMemoryLimit("mb", 1024);
             SharedDataStoreInstance->SetUdpReceiverDetails(8080, 30);
-            SharedDataStoreInstance->SetTcpReceiverDetails(8090, 30);
+            SharedDataStoreInstance->SetTcpOrderReceiverDetails(8090, 30);
             SharedDataStoreInstance->SetTcpClientRequestServiceDetails(9090, 30);
             logger::Logger::LOG("ConfigParser::SetDefaultConfigs", "Default configs set: maxEvents=10000, memoryType=mb, maxMemoryLimit=1024, udpPortNumber=8080, udptimeOut=30, tcpPortNumber=9090, tcptimeOut=30");
+        }
+
+        /// @brief method for updating the config file in the filesystem
+        /// @param configString 
+        /// @return true for successful update
+        bool ConfigParser::ChangeConfigFile(std::string const& configString){
+            auto jsonParserInstance{
+                std::dynamic_pointer_cast<JsonParser>(
+                    systemcontext::ComponentRegistry::GetComponent("JsonParser")
+                )
+            };
+            if(!jsonParserInstance){
+                logger::Logger::LOG("ConfigParser::ChangeConfigFile", "Json Parser Instance not available!", logger::LOGLEVEL::ERROR_LEVEL);
+                return false;
+            }
+            nlohmann::json configFileChangeRequestOrderJson = jsonParserInstance->ParseJsonFromString(configString);
+            if(configFileChangeRequestOrderJson.is_null()){
+                logger::Logger::LOG("ConfigParser::ChangeConfigFile", "invalid Config File received!", logger::LOGLEVEL::ERROR_LEVEL);
+                return false;
+            }
+            nlohmann::json configFile;
+            if(configFileChangeRequestOrderJson.contains("new_config") && configFileChangeRequestOrderJson.at("new_config").is_object()){
+                configFile = configFileChangeRequestOrderJson.at("new_config");
+            }else{
+                logger::Logger::LOG("ConfigParser::ChangeConfigFile", "invalid Config: new config is not present!", logger::LOGLEVEL::ERROR_LEVEL);
+                return false;
+            }
+            if(configFile.is_null() || configFile.empty()){
+                logger::Logger::LOG("ConfigParser::ChangeConfigFile", "invalid Config File received!", logger::LOGLEVEL::ERROR_LEVEL);
+                return false;
+            }
+            // writing json to filesystem
+            std::ofstream outf{ configPath_ };
+            // Check if the file was successfully opened
+            if (!outf) {
+                logger::Logger::LOG("ConfigParser::ChangeConfigFile", configPath_ + "could not be opened for writing!", logger::LOGLEVEL::ERROR_LEVEL);
+                return false;
+            }
+            // Write data to the file using the insertion operator
+            outf << configFile.dump(4);
+            logger::Logger::LOG("ConfigParser::ChangeConfigFile", configPath_ + " file updated successfully!");
+            return true;
         }
     }
 }

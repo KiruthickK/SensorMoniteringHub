@@ -209,9 +209,21 @@ namespace sensormoniteringhub{
             if (sock_ >= 0){
                 close(sock_);
             }
+            ClearData();
             logger::Logger::LOG("UDPReceiver::StopService", "Joined UDP receiver thread!");
         }
-
+        /// @brief method for clearing the config data members before stopping service
+        void UDPReceiver::ClearData(){
+            logger::Logger::LOG("UDPReceiver::ClearData", "Clearing UDP receiver data members!");
+            portNumber_ = 0U;
+            timeOutSeconds_ = 0U;
+            currentEcuName = "";
+            sock_ = -1;
+            receivedDataBufferQueue_;
+            activeSender_ = {};
+            hasActiveSender_ = false;
+            lastDataReceivedTimeStamp_ = 0U;
+        }
         void UDPReceiver::Initialize()
         {
             std::dynamic_pointer_cast<systemcontext::ComponentRegistry>(

@@ -23,6 +23,7 @@
 #define GREEN "\033[32m"
 #define YELLOW "\033[33m"
 #define RESET "\033[0m"
+#define CYAN "\033[36m"
 
 namespace sensormoniteringhub{
     namespace logger{
@@ -31,7 +32,8 @@ namespace sensormoniteringhub{
             INFO_LEVEL = 1,
             DEBUG_LEVEL = 2,
             ERROR_LEVEL = 3,
-            WARNING_LEVEL = 4
+            WARNING_LEVEL = 4,
+            LIFECYCLE_LEVEL = 5
         };
 
         /// @brief Logger class responsible for logging messages with different log levels.
@@ -49,6 +51,12 @@ namespace sensormoniteringhub{
             std::mutex LogMessageQueueMutex_;
             /// @brief for notifying when the queue is being pushed
             std::condition_variable LogQueuePushNotifierCV_;
+            /***
+             * @brief variable to store the generated log file name, so in case of 
+             * restarting, we have to use the first generated log file name, to prevent multiple files being created
+             * for single run of application
+             */
+            std::string GeneratedLogFileName{""};
             
             public:
             /// @brief Initializes the Logger instance.

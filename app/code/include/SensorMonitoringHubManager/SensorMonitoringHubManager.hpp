@@ -6,6 +6,7 @@
 #include <thread>
 #include <sys/prctl.h>
 #include <csignal>
+#include <atomic>
 #include <Events/IEvents.hpp>
 #include <JsonParser/ConfigParser.hpp>
 #include <SystemContext/ComponentRegistry.hpp>
@@ -20,6 +21,9 @@
 #include <ClientRequestService/ClientRequestService.hpp>
 #include <ClientRequestService/RequestParser.hpp>
 #include <ClientRequestService/ResponseEncoder.hpp>
+#include <ControlCommandService/CommandParser.hpp>
+#include <ControlCommandService/CommandResponseEncoder.hpp>
+#include <ControlCommandService/ControlCommandService.hpp>
 #include <TimerService/TimerService.hpp>
 
 namespace sensormoniteringhub{
@@ -31,18 +35,24 @@ namespace sensormoniteringhub{
             std::string const configPath{"../config/SMH_Config.json"};
             
             public:
+            static std::atomic<bool> restartFlag_;
             /// @brief Starts the Sensor Monitoring Hub service by loading configurations and signaling the completion of initialization.
             virtual void StartService();
             /// @brief Stops the Sensor Monitoring Hub service.
             virtual void StopService();
             /// @brief Initializes all necessary components for the Sensor Monitoring Hub Manager.
-            static void Initialize();
+            static void Initialize(std::shared_ptr<SensorMonitoringHubManager> SMHInstance);
             /// @brief Finalizes the Sensor Monitoring Hub Manager, performing any necessary cleanup.
             static void Finalize();
+            /// @brief Method for triggering clear events
+            bool ClearEvents();
+            bool ChangeConfig(std::string const& configData);
+            void RestartServices();
+            bool RegisterShutDownTriggerToEventDispatcher();
+            void ShutDownTrigger();
+            bool ShutDownRequest();
         };
     }
-    /// @brief for tracking the finalization
-    std::atomic<bool> gShutdownRequested{false};
 }
 
 #endif

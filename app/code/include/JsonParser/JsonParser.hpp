@@ -7,6 +7,7 @@
 #include <Logger/Logger.hpp>
 #include <SensorDataReceiver/SensorData.hpp>
 #include <ClientRequestService/RequestData.hpp>
+#include <ControlCommandService/CommandOrderInformation.hpp>
 #include <set>
 
 namespace sensormoniteringhub{
@@ -20,11 +21,14 @@ namespace sensormoniteringhub{
             nlohmann::json ParseJsonFromString(std::string const& jsonString);
             bool ParseAndValidateUDPSensorData(std::string const& jsonString, sensordatareceiver::SensorData& data);
             bool ParseRequestFromTCPClient(std::string const& jsonString, clientrequestservice::RequestData& data);
+            bool ParseCommandFromTCPClient(std::string const& jsonString, controlcommandservice::CommandOrderInformation& data);
             std::string SerializeResponseToTCPClientForGetEvents(std::vector <sensordatareceiver::SensorData> const& sensorDataContainer, clientrequestservice::RequestData const& reqData);
             std::string SerializeResponseToTCPClientForGetLatest(sensordatareceiver::SensorData const& sensorDataContainer, clientrequestservice::RequestData const& reqData);
             std::string SerializeResponseToTCPClientForGetSensorStatus(std::pair<bool, std::string>, clientrequestservice::RequestData const& reqData);
             std::string SerializeResponseToTCPClientForGetStats(std::pair<uint16_t, size_t>, clientrequestservice::RequestData const& reqData);
             std::string SerializeResponseToTCPClientForGetZones(std::set<std::string>, clientrequestservice::RequestData const& reqData);
+            std::string SerializeFailureResponseToTcpClient(std::string const& commandDataStr, std::string const& failureReason);
+            std::string SerializeSuccessResponseToTcpControlClient(std::string const& dataStr);
         };
     }
 }

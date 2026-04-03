@@ -58,6 +58,7 @@ namespace sensormoniteringhub{
                     logger::Logger::LOG("ResponseEncoder::EncodeResponseToString", "Unknown response data", logger::LOGLEVEL::ERROR_LEVEL);
                 }
             }, responseData);
+            logger::Logger::LOG("ResponseEncoder::EncodeResponseToString", "Converted response data into JSON string");
             return encodedString;
         }
 

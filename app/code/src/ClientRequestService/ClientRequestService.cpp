@@ -76,7 +76,7 @@ namespace sensormoniteringhub{
                 )
             };
             if(!dataPoolInstance){
-                logger::Logger::LOG("RequestParser::ParseRequest", "DataPool instance not available", logger::LOGLEVEL::ERROR_LEVEL);
+                logger::Logger::LOG("ClientRequestService::HandleRequest", "DataPool instance not available", logger::LOGLEVEL::ERROR_LEVEL);
                 return "-1";
             }
             auto responseEncoder{
@@ -105,14 +105,14 @@ namespace sensormoniteringhub{
                 if(ValidateEventGetEvents(reqData, isZoneIdPresent, isTimeStampPresent, isLimitPresent)){
                     std::vector<sensordatareceiver::SensorData> responseDataContainer;
                     if(!dataPoolInstance->GetEventsBasedOnZoneAndTimeStamp(reqData, responseDataContainer, isZoneIdPresent, isTimeStampPresent, isLimitPresent)){
-                        logger::Logger::LOG("RequestParser::ParseRequest", "No data available for the request : " + reqData.reqId_, logger::LOGLEVEL::WARNING_LEVEL);
+                        logger::Logger::LOG("ClientRequestService::HandleRequest", "No data available for the request : " + reqData.reqId_, logger::LOGLEVEL::WARNING_LEVEL);
                         return "-1";
                     }
                     // getting encoded response (struct objects(vector) -> JSON -> string)
                     responseStr = responseEncoder->EncodeResponseToString(responseDataContainer, reqData);
-                    logger::Logger::LOG("RequestParser::ParseRequest", "Data available for the request : " + reqData.reqId_);
+                    logger::Logger::LOG("ClientRequestService::HandleRequest", "Data available for the request : " + reqData.reqId_);
                 }else{
-                    logger::Logger::LOG("RequestParser::ParseRequest", "Invalid Request", logger::LOGLEVEL::ERROR_LEVEL);
+                    logger::Logger::LOG("ClientRequestService::HandleRequest", "Invalid Request", logger::LOGLEVEL::ERROR_LEVEL);
                 }
                 break;
             }
@@ -120,7 +120,7 @@ namespace sensormoniteringhub{
             {
                 sensordatareceiver::SensorData latestSensorData;
                 if(!dataPoolInstance->GetLastReceivedData(latestSensorData)){
-                    logger::Logger::LOG("RequestParser::ParseRequest", "No data available to respond", logger::LOGLEVEL::WARNING_LEVEL);
+                    logger::Logger::LOG("ClientRequestService::HandleRequest", "No data available to respond", logger::LOGLEVEL::WARNING_LEVEL);
                     return "-1";
                 }
                 // getting encoded response (struct object -> JSON -> string)
@@ -137,12 +137,12 @@ namespace sensormoniteringhub{
                 if(udpSensorReceiverInstance){
                     auto pair{udpSensorReceiverInstance->GetSensorEcuStatus()};
                     if(pair.second.empty()){
-                        logger::Logger::LOG("RequestParser::ParseRequest", "No data available to respond", logger::LOGLEVEL::WARNING_LEVEL);
+                        logger::Logger::LOG("ClientRequestService::HandleRequest", "No data available to respond", logger::LOGLEVEL::WARNING_LEVEL);
                         return "-1";
                     }
                     responseStr = responseEncoder->EncodeResponseToString(pair, reqData);
                 }else{
-                    logger::Logger::LOG("RequestParser::ParseRequest", "UDP Receiver instance not available", logger::LOGLEVEL::ERROR_LEVEL);
+                    logger::Logger::LOG("ClientRequestService::HandleRequest", "UDP Receiver instance not available", logger::LOGLEVEL::ERROR_LEVEL);
                 }
                 break;
             }
@@ -150,7 +150,7 @@ namespace sensormoniteringhub{
             {
                 auto pair{dataPoolInstance->GetStats()};
                 if(pair.first == 0U || pair.second == 0U){
-                    logger::Logger::LOG("RequestParser::ParseRequest", "No data available to respond", logger::LOGLEVEL::WARNING_LEVEL);
+                    logger::Logger::LOG("ClientRequestService::HandleRequest", "No data available to respond", logger::LOGLEVEL::WARNING_LEVEL);
                     return "-1";
                 }
                 responseStr = responseEncoder->EncodeResponseToString(pair, reqData);
@@ -158,20 +158,21 @@ namespace sensormoniteringhub{
             }
             case RequestType::GET_ZONES:
             {
-                auto uniqueZoneIds{dataPoolInstance->getUniqueZones()};
+                auto uniqueZoneIds{dataPoolInstance->GetUniqueZones()};
                 if(!uniqueZoneIds.empty()){
                     responseStr = responseEncoder->EncodeResponseToString(uniqueZoneIds, reqData);
                 }else{
-                    logger::Logger::LOG("RequestParser::ParseRequest", "No data available to respond", logger::LOGLEVEL::WARNING_LEVEL);
+                    logger::Logger::LOG("ClientRequestService::HandleRequest", "No data available to respond", logger::LOGLEVEL::WARNING_LEVEL);
                     return "-1";
                 }
                 break;
             }
             default:
-                logger::Logger::LOG("RequestParser::ParseRequest", "UNKNOWN request type", logger::LOGLEVEL::ERROR_LEVEL);
+                logger::Logger::LOG("ClientRequestService::HandleRequest", "UNKNOWN request type", logger::LOGLEVEL::ERROR_LEVEL);
                 return "-1";
                 break;
             }
+            logger::Logger::LOG("ClientRequestService::HandleRequest", "Data Collected for the request. Sending response JSON");
             return responseStr;
         }
         /// @brief helper method for validating the parsed response
