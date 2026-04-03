@@ -16,3 +16,5 @@ target_include_directories(SensorMonitoringHub PRIVATE
     ${INCLUDE_DIR}
     ${JSON_DIR}
 )
+find_package(Threads REQUIRED)
+target_link_libraries(SensorMonitoringHub PRIVATE Threads::Threads)

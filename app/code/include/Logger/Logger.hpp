@@ -13,6 +13,7 @@
 #include <ctime>
 #include <sstream>
 #include <iomanip>
+#include <filesystem>
 #include <condition_variable>
 #include <Events/IEvents.hpp>
 #include <SystemContext/ComponentRegistry.hpp>

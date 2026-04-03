@@ -8,13 +8,17 @@
 #include <thread>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <sys/prctl.h>
+#include <csignal>
+#include <thread>
+#include <atomic>
 
 #include <filesystem>
 #include <fstream>
 #include <chrono>
 
 namespace fs = std::filesystem;
-
+std::atomic<bool> runFlag;
 class UDPSender
 {
 public:
@@ -96,8 +100,8 @@ void SendData()
     }
 
     std::cout << "Found " << jsonFiles.size() << " JSON files\n";
-
-    while (true)
+    bool endFlag{false};
+    while (!endFlag) // not using runflag here because, we might miss sending BYE message
     {
         for (const auto& file : jsonFiles)
         {
@@ -121,6 +125,10 @@ void SendData()
             std::string msg{
                 j.dump()
             };
+            if(runFlag.load() == false){
+                msg = "BYE";
+                endFlag = true;
+            }
 
             std::vector<uint8_t> bytes(msg.begin(), msg.end());
 
@@ -130,9 +138,11 @@ void SendData()
                    0,
                    (sockaddr*)&serverAddr_,
                    sizeof(serverAddr_));
-
+            if(endFlag){
+                break;
+            }
             std::cout << "Sent file: " << file << std::endl;
-
+            
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }
@@ -147,12 +157,21 @@ private:
     sockaddr_in serverAddr_{};
 };
 
-#include <thread>
+
+void SignalHandler(int signal)
+{
+    if(signal == SIGTERM || signal == SIGINT)
+    {
+        runFlag.store(false);
+    }
+}
 
 int main()
 {
+    runFlag.store(true);
+    std::signal(SIGTERM, SignalHandler);
+    std::signal(SIGINT, SignalHandler);
     UDPSender sender("127.0.0.1", 8080);
-
     if (!sender.Start())
         return -1;
 
@@ -163,4 +182,5 @@ int main()
     }
 
     sender.SendData();
+    return 0;
 }

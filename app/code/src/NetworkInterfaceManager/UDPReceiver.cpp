@@ -77,7 +77,7 @@ namespace sensormoniteringhub{
                         // timer logic
                         if(TimerServiceInstance_->GetElapsedSeconds(lastDataReceivedTimeStamp_) >= timeOutSeconds_){
                             hasActiveSender_ = false;
-                            logger::Logger::LOG("UDPReceiver::UdpReceiverLoop", "Timeout Elapsed. Looking for the next receiver");
+                            logger::Logger::LOG("UDPReceiver::UdpReceiverLoop", "Timeout Elapsed. Looking for the next sender");
                         }
                         std::this_thread::sleep_for(std::chrono::milliseconds(10));
                         continue;
@@ -100,6 +100,13 @@ namespace sensormoniteringhub{
                         logger::Logger::LOG("UDPReceiver::UdpReceiverLoop", "Active sender found; Sender [address:port | "+senderAddressStr +" : " +std::to_string(sender.sin_port)+"]");
                     }
                     continue;
+                }
+                if(hasActiveSender_ && (msg.size() == 3)){
+                    if(msg == std::string_view{"BYE"}){
+                        hasActiveSender_ = false;
+                        logger::Logger::LOG("UDPReceiver::UdpReceiverLoop", "UDP sender completed sending data. Looking for the next sender");
+                        continue;
+                    }
                 }
                 if (!IsSameSender(sender)){
                     SendReply(sender, "BUSY");
