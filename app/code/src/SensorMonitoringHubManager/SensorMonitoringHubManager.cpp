@@ -1,6 +1,8 @@
 #include <SensorMonitoringHubManager/SensorMonitoringHubManager.hpp>
 
 namespace sensormoniteringhub{
+    /// @brief for tracking the finalization
+    std::atomic<bool> gShutdownRequested{false};
     namespace sensormonitoringhubmanager{
 
         /// @brief Starts the Sensor Monitoring Hub service by loading configurations and signaling the completion of initialization.
@@ -17,14 +19,32 @@ namespace sensormoniteringhub{
             )->OnInitializeFinish();
         }
 
+        /// @brief method for triggering clear events
+        /// @return true if success
+        bool SensorMonitoringHubManager::ClearEvents(){
+            auto DataPoolInstance{
+                std::dynamic_pointer_cast<datapool::DataPool>(
+                    systemcontext::ComponentRegistry::GetComponent("DataPool")
+                )
+            };
+            if(!DataPoolInstance){
+                logger::Logger::LOG("SensorMonitoringHubManager::ClearEvents", "DataPool instance not available!", logger::LOGLEVEL::ERROR_LEVEL);
+                return false;
+            }
+            logger::Logger::LOG("SensorMonitoringHubManager::ClearEvents", "Calling DataPool for Clearing the Events");
+            return DataPoolInstance->ClearEvents();
+        }
         void SensorMonitoringHubManager::StopService()
         {
         }
 
         /// @brief Initializes all necessary components for the Sensor Monitoring Hub Manager.
-        void SensorMonitoringHubManager::Initialize()
+        void SensorMonitoringHubManager::Initialize(std::shared_ptr<SensorMonitoringHubManager> SMHInstance)
         {
             systemcontext::ComponentRegistry::Initialize();
+            std::dynamic_pointer_cast<systemcontext::ComponentRegistry>(
+                systemcontext::ComponentRegistry::GetComponent("ComponentRegistry")
+            )->RegisterComponent("SensorMonitoringHubManager", SMHInstance);
             logger::Logger::Initialize();
             systemcontext::SharedDataStore::Initialize();
             eventdispatcher::EventDispatcher::Initialize();
@@ -82,10 +102,10 @@ int main(int argc, char const *argv[])
     // prctl(PR_SET_NAME, "SMH", 0, 0, 0);
     std::signal(SIGTERM, SignalHandler);
     std::signal(SIGINT, SignalHandler);
-    std::unique_ptr<sensormoniteringhub::sensormonitoringhubmanager::SensorMonitoringHubManager> SensorMoniteringHub_{
-        std::make_unique<sensormoniteringhub::sensormonitoringhubmanager::SensorMonitoringHubManager>()
+    std::shared_ptr<sensormoniteringhub::sensormonitoringhubmanager::SensorMonitoringHubManager> SensorMoniteringHub_{
+        std::make_shared<sensormoniteringhub::sensormonitoringhubmanager::SensorMonitoringHubManager>()
     };
-    SensorMoniteringHub_->Initialize();
+    SensorMoniteringHub_->Initialize(SensorMoniteringHub_);
     SensorMoniteringHub_->StartService();
     while(!sensormoniteringhub::gShutdownRequested.load()){
         std::this_thread::sleep_for(std::chrono::milliseconds(50));

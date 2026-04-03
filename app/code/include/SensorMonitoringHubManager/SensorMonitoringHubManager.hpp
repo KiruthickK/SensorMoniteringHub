@@ -39,13 +39,13 @@ namespace sensormoniteringhub{
             /// @brief Stops the Sensor Monitoring Hub service.
             virtual void StopService();
             /// @brief Initializes all necessary components for the Sensor Monitoring Hub Manager.
-            static void Initialize();
+            static void Initialize(std::shared_ptr<SensorMonitoringHubManager> SMHInstance);
             /// @brief Finalizes the Sensor Monitoring Hub Manager, performing any necessary cleanup.
             static void Finalize();
+            /// @brief Method for triggering clear events
+            bool ClearEvents();
         };
     }
-    /// @brief for tracking the finalization
-    std::atomic<bool> gShutdownRequested{false};
 }
 
 #endif

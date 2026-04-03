@@ -5,6 +5,7 @@
 #include <map>
 #include <Logger/Logger.hpp>
 #include <SystemContext/ComponentRegistry.hpp>
+#include <SensorMonitoringHubManager/SensorMonitoringHubManager.hpp>
 
 #include <memory>
 namespace sensormoniteringhub{
@@ -19,6 +20,7 @@ namespace sensormoniteringhub{
             static void Finalize();
             void SetRegisteredComponents(std::map<std::string, std::shared_ptr<IEvents>> RegisteredComponents);
             void OnInitializeFinish();
+            bool OnClearEvents();
         };
     }
 }

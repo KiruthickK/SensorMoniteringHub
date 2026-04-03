@@ -5,6 +5,10 @@ namespace sensormoniteringhub{
         std::shared_ptr<Logger> Logger::LoggerInstance_ = nullptr;
         void Logger::StartService()
         {
+            if(LogsFileEntryThread_.joinable()){
+                std::cerr << "[Logger::StartService] Logger already started, ignoring repeated start request" << std::endl;
+                return;
+            }
             std::string filename = generateFileName();
             LogsFileEntryThread_ = std::thread([this, filename](){
                 std::ofstream file("../logs/" + filename, std::ios::app);

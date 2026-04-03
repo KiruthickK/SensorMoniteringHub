@@ -30,9 +30,18 @@ namespace sensormoniteringhub{
             }
             CommandOrderInformation currentCommandOrderInformation;
             if(commandParserInstance->ParseCommand(command, currentCommandOrderInformation)){
-                /**
-                 * @todo next steps
-                 */
+                auto eventDispatcherInstance{
+                    std::dynamic_pointer_cast<eventdispatcher::EventDispatcher>(
+                        systemcontext::ComponentRegistry::GetComponent("EventDispatcher")
+                    )
+                };
+                if(!eventDispatcherInstance){
+                    /** @todo reply with failed json */
+                    return "-1";
+                }
+                if(eventDispatcherInstance->OnClearEvents()){
+                    logger::Logger::LOG("ControlCommandService::HandleControlCommand", "Events Cleared!");
+                }
             }else{
                 logger::Logger::LOG("ControlCommandService::HandleControlCommand", "Command Parsing failed!", logger::LOGLEVEL::ERROR_LEVEL);
             }

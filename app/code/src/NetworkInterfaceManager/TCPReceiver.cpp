@@ -288,9 +288,8 @@ namespace sensormoniteringhub{
                         // @todo the next block
                         {
                             idleSeconds++;
-                            if (idleSeconds >= 15)
-                            {
-                                std::cout << "Client idle timeout\n";
+                            if (idleSeconds >= 15){
+                                logger::Logger::LOG("TCPReceiver::HandleCurrentRequestClient","Client idle timeout", logger::LOGLEVEL::WARNING_LEVEL);
                                 break;
                             }
                         }
