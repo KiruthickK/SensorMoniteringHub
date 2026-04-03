@@ -44,7 +44,7 @@ namespace sensormoniteringhub{
             bool IsHandshake(const std::string& msg);
             void SendReply(const sockaddr_in& sender, const std::string& msg);
             bool IsSameSender(const sockaddr_in& sender);
-
+            void ClearData();
             public:
             virtual void StartService();
             virtual void StopService();

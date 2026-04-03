@@ -6,6 +6,7 @@
 #include <thread>
 #include <sys/prctl.h>
 #include <csignal>
+#include <atomic>
 #include <Events/IEvents.hpp>
 #include <JsonParser/ConfigParser.hpp>
 #include <SystemContext/ComponentRegistry.hpp>
@@ -34,6 +35,7 @@ namespace sensormoniteringhub{
             std::string const configPath{"../config/SMH_Config.json"};
             
             public:
+            static std::atomic<bool> restartFlag_;
             /// @brief Starts the Sensor Monitoring Hub service by loading configurations and signaling the completion of initialization.
             virtual void StartService();
             /// @brief Stops the Sensor Monitoring Hub service.
@@ -44,6 +46,11 @@ namespace sensormoniteringhub{
             static void Finalize();
             /// @brief Method for triggering clear events
             bool ClearEvents();
+            bool ChangeConfig(std::string const& configData);
+            void RestartServices();
+            bool RegisterShutDownTriggerToEventDispatcher();
+            void ShutDownTrigger();
+            bool ShutDownRequest();
         };
     }
 }

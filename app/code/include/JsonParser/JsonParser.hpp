@@ -27,6 +27,8 @@ namespace sensormoniteringhub{
             std::string SerializeResponseToTCPClientForGetSensorStatus(std::pair<bool, std::string>, clientrequestservice::RequestData const& reqData);
             std::string SerializeResponseToTCPClientForGetStats(std::pair<uint16_t, size_t>, clientrequestservice::RequestData const& reqData);
             std::string SerializeResponseToTCPClientForGetZones(std::set<std::string>, clientrequestservice::RequestData const& reqData);
+            std::string SerializeFailureResponseToTcpClient(std::string const& commandDataStr, std::string const& failureReason);
+            std::string SerializeSuccessResponseToTcpControlClient(std::string const& dataStr);
         };
     }
 }

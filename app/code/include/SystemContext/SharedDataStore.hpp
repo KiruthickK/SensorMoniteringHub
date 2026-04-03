@@ -24,6 +24,7 @@ namespace sensormoniteringhub{
             uint16_t tcptimeOut_;
             uint16_t tcpClientRequestServicePortNumber_;
             uint16_t tcpClientRequestServicetimeOut_;
+            void ClearData();
             public:
             virtual void StartService();
             virtual void StopService();

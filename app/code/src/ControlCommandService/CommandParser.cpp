@@ -34,7 +34,8 @@ namespace sensormoniteringhub{
                     return false;
                 }
                 logger::Logger::LOG("CommandParser::ParseCommand", "Command Parsed successfully. Received Command Order ID: "+commandInfo.orderId_+" Received Command:"
-                    " " + ((commandInfo.type_ == CommandType::CLEAR_EVENTS) ? "CLEAR_EVENTS" : "TODO")); /** @todo After adding more commands, have to edit this log  */
+                    " " + ((commandInfo.type_ == CommandType::CLEAR_EVENTS) ? "CLEAR_EVENTS" : 
+                    ((commandInfo.type_ == CommandType::CONFIG_CHANGE)? "CONFIG_CHANGE":"SHUTDOWN_REQUEST")));
                 return true;
             }else{
                 logger::Logger::LOG("CommandParser::ParseCommand", "Command parsing failed!", logger::LOGLEVEL::ERROR_LEVEL);

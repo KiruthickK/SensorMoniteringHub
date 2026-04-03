@@ -45,7 +45,7 @@ namespace sensormoniteringhub{
                 logger::Logger::LOG("JsonParser::ParseAndValidateUDPSensorData", "Received empty JSON", logger::LOGLEVEL::WARNING_LEVEL);
                 return false;
             }
-            logger::Logger::LOG("JsonParser::ParseAndValidateUDPSensorData", "Received sensor data [JSON.dump()]: " + parsedJson.dump(), logger::LOGLEVEL::DEBUG_LEVEL);
+            logger::Logger::LOG("JsonParser::ParseAndValidateUDPSensorData", "Received sensor data [JSON.dump()]: \n" + parsedJson.dump(4), logger::LOGLEVEL::DEBUG_LEVEL);
             if(!parsedJson.contains("sensor_id") || !parsedJson.at("sensor_id").is_string()){
                 logger::Logger::LOG("JsonParser::ParseAndValidateUDPSensorData", "Received JSON with invalid sensor_id details", logger::LOGLEVEL::WARNING_LEVEL);
                 return false;
@@ -103,7 +103,7 @@ namespace sensormoniteringhub{
                 logger::Logger::LOG("JsonParser::ParseRequestFromTCPClient", "Received empty JSON", logger::LOGLEVEL::WARNING_LEVEL);
                 return false;
             }
-            logger::Logger::LOG("JsonParser::ParseRequestFromTCPClient", "Received request data [JSON.dump()]: " + parsedJson.dump(), logger::LOGLEVEL::DEBUG_LEVEL);
+            logger::Logger::LOG("JsonParser::ParseRequestFromTCPClient", "Received request data [JSON.dump()]: \n" + parsedJson.dump(4), logger::LOGLEVEL::DEBUG_LEVEL);
             if(!parsedJson.contains("request_type") || !parsedJson.at("request_type").is_string()){
                 logger::Logger::LOG("JsonParser::ParseRequestFromTCPClient", "Request_type is not present in the request, request json validation failed", logger::LOGLEVEL::ERROR_LEVEL);
                 return false;
@@ -174,6 +174,7 @@ namespace sensormoniteringhub{
             responseJson["sensor_data_readings"] = nlohmann::json::array();
             for(auto const& sensorData : sensorDataContainer){
                 nlohmann::json sensor_data_reading;
+                responseJson["status"] = "success";
                 sensor_data_reading["timestamp"] = sensorData.timeStamp_;
                 sensor_data_reading["motion_intensity"] = sensorData.motionIntensity_;
                 sensor_data_reading["temperature"] = sensorData.temperature_;
@@ -190,6 +191,7 @@ namespace sensormoniteringhub{
         /// @return dumped string of formed json object
         std::string JsonParser::SerializeResponseToTCPClientForGetLatest(sensordatareceiver::SensorData const& sensorDataContainer, clientrequestservice::RequestData const& reqData){
             nlohmann::json responseJson;
+            responseJson["status"] = "success";
             responseJson["response_id"] = reqData.reqId_;
             responseJson["zone_id"] = sensorDataContainer.zoneId_;
             responseJson["timestamp"] = sensorDataContainer.timeStamp_;
@@ -206,6 +208,7 @@ namespace sensormoniteringhub{
         /// @return dumped string from the json
         std::string JsonParser::SerializeResponseToTCPClientForGetSensorStatus(std::pair<bool, std::string> pair, clientrequestservice::RequestData const& reqData){
             nlohmann::json responseJson;
+            responseJson["status"] = "success";
             responseJson["response_id"] = reqData.reqId_;
             responseJson["sensor_status"] = (pair.first ? "active" : "inactive");
             responseJson["ecu_name"] = pair.second;
@@ -215,9 +218,10 @@ namespace sensormoniteringhub{
         /// @brief method to form json from the current stats
         /// @param pair 
         /// @param reqData 
-        /// @return 
+        /// @return dumped string from the json
         std::string JsonParser::SerializeResponseToTCPClientForGetStats(std::pair<uint16_t, size_t> pair, clientrequestservice::RequestData const& reqData){
             nlohmann::json responseJson;
+            responseJson["status"] = "success";
             responseJson["response_id"] = reqData.reqId_;
             responseJson["current_sensor_data_received"] = pair.first;
             responseJson["current_memory_used_int_bytes"] = pair.second;
@@ -227,14 +231,33 @@ namespace sensormoniteringhub{
         /// @brief method for forming JSON from set of zones we received from udp sensor data
         /// @param zones 
         /// @param reqData 
-        /// @return 
+        /// @return dumped string from the json
         std::string JsonParser::SerializeResponseToTCPClientForGetZones(std::set<std::string> zones, clientrequestservice::RequestData const& reqData){
             nlohmann::json responseJson;
+            responseJson["status"] = "success";
             responseJson["response_id"] = reqData.reqId_;
             responseJson["zones"] = zones; // set will automatically converted to JSON array
             return responseJson.dump();
         }
 
+        /// @brief method for forming JSON for failure response for tcp control client
+        /// @param failureReason 
+        /// @return dumped string from the json
+        std::string JsonParser::SerializeFailureResponseToTcpClient(std::string const& commandDataStr, std::string const& failureReason){
+            nlohmann::json responseJson = ParseJsonFromString(commandDataStr); //with the command request json, we are just updating the status
+            responseJson["status"] = "failed";
+            responseJson["failure_reason"] = failureReason;
+            return responseJson.dump();
+        }
+
+        /// @brief method for forming JSON for success response for tcp control client
+        /// @param dataStr 
+        /// @return dumped string from the json
+        std::string JsonParser::SerializeSuccessResponseToTcpControlClient(std::string const& dataStr){
+            nlohmann::json responseJson = ParseJsonFromString(dataStr); //with the command request json, we are just updating the status
+            responseJson["status"] = "success";
+            return responseJson.dump();
+        }
         void JsonParser::Finalize()
         {
         }

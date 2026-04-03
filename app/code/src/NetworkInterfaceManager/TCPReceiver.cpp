@@ -34,6 +34,23 @@ namespace sensormoniteringhub{
                 shutdown(tcpControlClientSocket_, SHUT_RDWR);
                 close(tcpControlClientSocket_);
             }
+            if(tcpControlClientReceiverThread_.joinable()){
+                tcpControlClientReceiverThread_.join();
+            }
+            if(tcpClientRequestServiceReceiverThread_.joinable()){
+                tcpClientRequestServiceReceiverThread_.join();
+            }
+            ClearData();
+            logger::Logger::LOG("TCPReceiver::StopService", "Threads joined!");
+        }
+        
+        /// @brief method for clearing the config data members before stopping service
+        void TCPReceiver::ClearData(){
+            logger::Logger::LOG("TCPReceiver::StopService", "Clearing data!");
+            tcpClientReceiverServiceSocket_ = -1;
+            tcpControlClientSocket_ = -1;
+            controlClientPortNumber_ = 0U;
+            controlClientTimeOutSeconds_ = 0U;
         }
 
         /// @brief method for creating instance of the class and registering it
@@ -161,6 +178,15 @@ namespace sensormoniteringhub{
                 logger::Logger::LOG("TCPReceiver::HandleCurrentControlClient", "Control Command Service Instance not available", logger::LOGLEVEL::ERROR_LEVEL);
                 return;
             }
+            auto eventDispatcherInstance{
+                std::dynamic_pointer_cast<eventdispatcher::EventDispatcher>(
+                    systemcontext::ComponentRegistry::GetComponent("EventDispatcher")
+                )
+            };
+            if(!eventDispatcherInstance){
+                logger::Logger::LOG("TCPReceiver::HandleCurrentControlClient", "Event Dispatcher Instance not available!", logger::LOGLEVEL::ERROR_LEVEL);
+                return;
+            }
             while(!tcpControlClientReceiverStopSignal_.load()){
                 int bytes = recv(clientSocket, recvBuffer, sizeof(recvBuffer), 0);
                 // case when we received a command from the control client
@@ -190,6 +216,8 @@ namespace sensormoniteringhub{
                             }
                             totalSent += sent;
                         }
+                        // before proceeding to next request, triggering callbacks, if they anything is registered
+                        eventDispatcherInstance->TriggerPostResponseCallback(); //if there is no callbacks registered, this method will return immediately
                     }
                 }
                 // case when the control client disconnected

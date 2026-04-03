@@ -39,7 +39,7 @@ namespace sensormoniteringhub{
                         logger::Logger::LOG("SensorDataReceiver::ProcessReceivedUdpData","DataPool instance is not available",logger::LOGLEVEL::ERROR_LEVEL);
                     }
                 }else{
-                    logger::Logger::LOG("SensorDataReceiver::ProcessReceivedUdpData", "Received sensor data JSON validation Failed");
+                    logger::Logger::LOG("SensorDataReceiver::ProcessReceivedUdpData", "Received sensor data JSON validation Failed", logger::LOGLEVEL::WARNING_LEVEL);
                 }
             }else{
                 logger::Logger::LOG("SensorDataReceiver::ProcessReceivedUdpData","JsonParser instance is not available",logger::LOGLEVEL::ERROR_LEVEL);

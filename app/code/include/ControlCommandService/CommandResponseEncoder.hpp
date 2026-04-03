@@ -3,6 +3,8 @@
 
 #include <Events/IEvents.hpp>
 #include <Logger/Logger.hpp>
+#include <JsonParser/JsonParser.hpp>
+#include <ControlCommandService/CommandOrderInformation.hpp>
 
 namespace sensormoniteringhub{
     namespace controlcommandservice{
@@ -12,6 +14,8 @@ namespace sensormoniteringhub{
             static void Finalize();
             virtual void StartService();
             virtual void StopService();
+            std::string GetFailureResponse(std::string const& commandRequestStr, std::string const& failureReasonStr);
+            std::string GetSuccessResponse(std::string const& commandRequestStr);
         };
     }
 }
