@@ -5,6 +5,7 @@ set(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 set(SRC_DIR ${APP_ROOT}/code/src)
 set(INCLUDE_DIR ${APP_ROOT}/code/include)
 set(JSON_DIR ${APP_ROOT}/external/libraries/JSON)
+set(SQLITE_DIR ${APP_ROOT}/external/libraries/SQLite)
 
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
     ${SRC_DIR}/*.cpp
@@ -12,9 +13,13 @@ file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
 
 add_executable(SensorMonitoringHub ${SRC_FILES})
 set_target_properties(SensorMonitoringHub PROPERTIES OUTPUT_NAME "SMH")
+target_sources(SensorMonitoringHub PRIVATE
+    ${SQLITE_DIR}/sqlite3.c
+)
 target_include_directories(SensorMonitoringHub PRIVATE
     ${INCLUDE_DIR}
     ${JSON_DIR}
+    ${SQLITE_DIR} 
 )
-find_package(Threads REQUIRED)
-target_link_libraries(SensorMonitoringHub PRIVATE Threads::Threads)
+find_package(Threads REQUIRED)  
+target_link_libraries(SensorMonitoringHub PRIVATE Threads::Threads  dl)

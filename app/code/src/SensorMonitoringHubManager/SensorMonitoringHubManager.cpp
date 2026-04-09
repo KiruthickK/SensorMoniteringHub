@@ -63,10 +63,10 @@ namespace sensormoniteringhub{
             logger::Logger::Initialize();
             systemcontext::SharedDataStore::Initialize();
             eventdispatcher::EventDispatcher::Initialize();
+            datapool::DataPool::Initialize();
             networkinterfacemanager::TCPReceiver::Initialize();
             networkinterfacemanager::UDPReceiver::Initialize();
             sensordatareceiver::SensorDataReceiver::Initialize();
-            datapool::DataPool::Initialize();
             jsonparser::JsonParser::Initialize();
             jsonparser::ConfigParser::Initialize();
             clientrequestservice::ClientRequestService::Initialize();
@@ -94,10 +94,10 @@ namespace sensormoniteringhub{
             controlcommandservice::ControlCommandService::Finalize();
             jsonparser::ConfigParser::Finalize();
             jsonparser::JsonParser::Finalize();
-            datapool::DataPool::Finalize();
             sensordatareceiver::SensorDataReceiver::Finalize();
             networkinterfacemanager::UDPReceiver::Finalize();
             networkinterfacemanager::TCPReceiver::Finalize();
+            datapool::DataPool::Finalize();
             eventdispatcher::EventDispatcher::Finalize();
             systemcontext::SharedDataStore::Finalize();
             logger::Logger::Finalize();

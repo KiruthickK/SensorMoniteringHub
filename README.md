@@ -12,6 +12,7 @@ A lightweight middleware service that collects data from motion detection sensor
 - [Simulators](#simulators)
   - [UDP Sensor Data Simulator](#udp-sensor-data-simulator)
   - [TCP Request Client Simulator](#tcp-request-client-simulator)
+  - [TCP Control Client Simulator](#tcp-control-client-simulator)
 
 ---
 
@@ -70,6 +71,20 @@ g++ -std=c++17 TcpRequestClientSim.cpp -o tcpClient
 ./tcpClient
 ```
 
+### TCP Control Client Simulator
+
+Simulates a control client sending command orders to the hub over TCP. Supported commands include:
+
+- **Change Config** — Sends a new configuration to the hub; the hub restarts its services to apply the updated configuration
+- **Clear Data** — Clears all currently stored sensor data in the hub
+- **Shutdown** — Sends a shutdown command to gracefully stop the hub
+
+```bash
+cd simulators/tcp_control_client_simulator
+g++ -std=c++17 TcpControlClientSim.cpp -o tcpControlClient
+./tcpControlClient
+```
+
 ---
 
 ## Prerequisites
@@ -96,6 +111,11 @@ g++ -std=c++17 TcpRequestClientSim.cpp -o tcpClient
 │   │   │   │   ├── RequestData.hpp
 │   │   │   │   ├── RequestParser.hpp
 │   │   │   │   └── ResponseEncoder.hpp
+│   │   │   ├── ControlCommandService
+│   │   │   │   ├── CommandOrderInformation.hpp
+│   │   │   │   ├── CommandParser.hpp
+│   │   │   │   ├── CommandResponseEncoder.hpp
+│   │   │   │   └── ControlCommandService.hpp
 │   │   │   ├── DataPool
 │   │   │   │   └── DataPool.hpp
 │   │   │   ├── EventDispatcher
@@ -125,6 +145,10 @@ g++ -std=c++17 TcpRequestClientSim.cpp -o tcpClient
 │   │       │   ├── ClientRequestService.cpp
 │   │       │   ├── RequestParser.cpp
 │   │       │   └── ResponseEncoder.cpp
+│   │       ├── ControlCommandService
+│   │       │   ├── CommandParser.cpp
+│   │       │   ├── CommandResponseEncoder.cpp
+│   │       │   └── ControlCommandService.cpp
 │   │       ├── DataPool
 │   │       │   └── DataPool.cpp
 │   │       ├── EventDispatcher
@@ -154,10 +178,6 @@ g++ -std=c++17 TcpRequestClientSim.cpp -o tcpClient
 │   │           └── nlohmann
 │   │               ├── json_fwd.hpp
 │   │               └── json.hpp
-│   ├── logs
-│   │   ├── Log-Mar-24-10Hrs-33Mins.txt
-│   │   ├── Log-Mar-24-10Hrs-53Mins.txt
-│   │   └── Log-Mar-24-10Hrs-57Mins.txt
 │   └── tools
 │       ├── build.sh
 │       └── run.sh
@@ -166,8 +186,11 @@ g++ -std=c++17 TcpRequestClientSim.cpp -o tcpClient
     ├── nlohmann
     │   ├── json_fwd.hpp
     │   └── json.hpp
+    ├── tcp_control_client_simulator
+    │   ├── config
+    │   │   └── SMH_Config.json
+    │   └── TcpControlClientSim.cpp
     ├── tcp_request_client_simulator
-    │   ├── tcpClient
     │   └── TcpRequestClientSim.cpp
     └── udp_sensor_simulator
         ├── SensorDataSource
@@ -177,6 +200,4 @@ g++ -std=c++17 TcpRequestClientSim.cpp -o tcpClient
         │   ├── valid_data_3.json
         │   └── valid_data_4.json
         └── udp_sensor_simulation.cpp
-
-41 directories, 55 files
 ```
