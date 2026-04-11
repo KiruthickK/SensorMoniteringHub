@@ -1,19 +1,40 @@
-#include <Events/IEvents.hpp>
+#ifndef PERSISTENCEMANAGER_HEADER
+#define PERSISTENCEMANAGER_HEADER
+
+
 #include <sqlite3.h>
 #include <iostream>
 #include <filesystem>
+#include <SensorDataReceiver/SensorData.hpp>
+#include <vector>
 
 namespace sensormoniteringhub{
     namespace persistencemanager{
-        class PersistenceManager : public IEvents {
+        /**
+         * PersistenceManager has exactly one consumer — DataPool
+         * So here we gonna follow composition.
+         * PersistenceManager will be handled by DataPool
+         */
+        class PersistenceManager {
         private:
-            std::string const dbPath{"../../data/"};
-            std::string const dbName{"smh.db"};
+            std::string const dbPath_{"../data/"};
+            std::string const dbName_{"smh.db"};
+            uint64_t maxEvents_;
+            uint64_t curEvents_;
+            std::string const dbTableName_{"SENSOR_DATA_TABLE"};
+            sqlite3* dbHandler_{nullptr};
+            bool OpenDataBase();
+            bool CheckTableExistsInDb();
+            bool CreateTableInDb();
+            bool CleanupData();
         public:
-            virtual void StartService();
-            virtual void StopService();
-            static void Initialize();
-            static void Finalize();
+            void StartService();
+            void StopService();
+            void SetMaxEvents(uint64_t maxEvents);
+            bool GetRecoveredSensorData(std::vector<sensordatareceiver::SensorData> &sensorDataContainer);
+            void PersistSensorData(std::vector<sensordatareceiver::SensorData> const &sensorDataContainer);
         };
     }
 }
+
+#endif

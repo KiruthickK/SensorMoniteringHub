@@ -49,13 +49,6 @@ namespace sensormoniteringhub{
             }
             nlohmann::json config;
             file >> config;
-            if(config.contains("maxEvent") && config.at("maxEvent").is_number()){
-                uint16_t maxEvents{config["maxEvent"]};
-                logger::Logger::LOG("ConfigParser::LoadConfigs", "Loaded maxEvents; value=["+std::to_string(maxEvents)+"]");
-                SharedDataStoreInstance->SetMaxEvent(maxEvents);
-            }else{
-                SharedDataStoreInstance->SetMaxEvent(10000); // setting default value in case of failure
-            }
             if(config.contains("memoryLimit") && config.at("memoryLimit").is_object()){
                 std::string memoryType{""};
                 uint16_t maxMemoryLimit{0U};
@@ -155,12 +148,11 @@ namespace sensormoniteringhub{
                 logger::Logger::LOG("ConfigParser::SetDefaultConfigs", "Shared Data Store instance is not available", logger::LOGLEVEL::ERROR_LEVEL);
                 return;
             }
-            SharedDataStoreInstance->SetMaxEvent(10000);
             SharedDataStoreInstance->SetMemoryLimit("mb", 1024);
             SharedDataStoreInstance->SetUdpReceiverDetails(8080, 30);
             SharedDataStoreInstance->SetTcpOrderReceiverDetails(8090, 30);
             SharedDataStoreInstance->SetTcpClientRequestServiceDetails(9090, 30);
-            logger::Logger::LOG("ConfigParser::SetDefaultConfigs", "Default configs set: maxEvents=10000, memoryType=mb, maxMemoryLimit=1024, udpPortNumber=8080, udptimeOut=30, tcpPortNumber=9090, tcptimeOut=30");
+            logger::Logger::LOG("ConfigParser::SetDefaultConfigs", "Default configs set: memoryType=mb, maxMemoryLimit=1024, udpPortNumber=8080, udptimeOut=30, tcpPortNumber=9090, tcptimeOut=30");
         }
 
         /// @brief method for updating the config file in the filesystem

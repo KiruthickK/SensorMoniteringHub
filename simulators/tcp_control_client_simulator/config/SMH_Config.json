@@ -1,8 +1,7 @@
 {
-    "maxEvent" : 100,
     "memoryLimit" : {
         "memoryType" : "kb",
-        "maxMemoryLimit": 100
+        "maxMemoryLimit": 10
     },
     "udpReceiverDetails" : {
         "portNumber" : 8080,

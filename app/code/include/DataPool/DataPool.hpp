@@ -6,6 +6,8 @@
 #include <Logger/Logger.hpp>
 #include <SensorDataReceiver/SensorData.hpp>
 #include <ClientRequestService/RequestData.hpp>
+#include <memory>
+#include <PersistenceManager/PersistenceManager.hpp>
 #include <thread>
 #include <algorithm>
 #include <iterator>
@@ -22,18 +24,21 @@ namespace sensormoniteringhub{
         };
         class DataPool : public IEvents{
             private:
-            uint16_t maxEvents_;
+            uint64_t maxEvents_;
             size_t sensorDataSize;
-            uint16_t currEventCount_;
+            uint64_t currEventCount_;
             uint16_t maxMemoryLimit_;
             MemoryConfig maxMemoryUsageBytes_;
             size_t currentMemoryUsageBytes_;
             std::string memoryType_;
             sensordatareceiver::SensorData lastReceivedSensorData_;
+            /** composing Persistence Manager object into Datapool */
+            std::unique_ptr<persistencemanager::PersistenceManager> persistenceManagerInstance_;
             std::vector<sensordatareceiver::SensorData> receivedSensorDataContainer_;
             std::set<std::string> uniqueZoneIds_;
             std::mutex receivedSensorDataContainerMutex_;
             bool CheckSpaceAndEventStorageAvailability();
+            void TakeUniqueZonesFromContainer();
             public:
             DataPool();
             virtual void StartService();

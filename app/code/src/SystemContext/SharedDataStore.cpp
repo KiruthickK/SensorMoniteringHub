@@ -16,7 +16,6 @@ namespace sensormoniteringhub{
         /// @brief method for clearing the config data members before stopping service
         void SharedDataStore::ClearData(){
             logger::Logger::LOG("SharedDataStore::ClearData", "Clearing the stored data!" );
-            maxEvent_ = 0U;
             currEventCount_= 0U;
             maxMemoryLimit_= 0U;
             currMemoryUsage_= 0U;
@@ -40,18 +39,6 @@ namespace sensormoniteringhub{
         {
         }
 
-        /// @brief Sets the maximum event limit for the SharedDataStore.
-        /// @param maxEvent The maximum number of events to allow.
-        void SharedDataStore::SetMaxEvent(uint16_t maxEvent){
-            maxEvent_ = maxEvent;
-            logger::Logger::LOG("SharedDataStore::SetMaxEvent", "Max event set to: " + std::to_string(maxEvent));
-        }
-
-        /// @brief getter method for sending max events
-        /// @return maxEvent_
-        uint16_t SharedDataStore::GetMaxEvent(){
-            return maxEvent_;
-        }
 
         /// @brief Sets the memory limit for the SharedDataStore.
         /// @param memoryType The type of memory to set the limit for.

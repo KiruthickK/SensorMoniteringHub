@@ -12,7 +12,6 @@ namespace sensormoniteringhub{
         /// @brief SharedDataStore class responsible for storing and managing shared data across different components of the Sensor Monitoring Hub Manager, including configuration parameters and other relevant information.
         class SharedDataStore : public IEvents{
             private:
-            uint16_t maxEvent_;
             uint16_t currEventCount_;
             uint16_t maxMemoryLimit_;
             uint16_t currMemoryUsage_;
@@ -30,7 +29,6 @@ namespace sensormoniteringhub{
             virtual void StopService();
             static void Initialize();
             static void Finalize();
-            void SetMaxEvent(uint16_t maxEvent);
             void SetMemoryLimit(std::string memoryType, uint16_t maxMemoryLimit);
             void SetUdpReceiverDetails(uint16_t portNumber, uint16_t timeOut);
             void SetTcpOrderReceiverDetails(uint16_t portNumber, uint16_t timeOut);
@@ -41,7 +39,6 @@ namespace sensormoniteringhub{
             uint16_t GetUdpTimeOut();
             uint16_t GetTcpTimeOut();
             uint16_t GetTcpClientRequestServiceTimeOut();
-            uint16_t GetMaxEvent();
             std::pair<std::string, uint16_t> GetMemoryLimit();
         };
     }
