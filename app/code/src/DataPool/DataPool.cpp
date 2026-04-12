@@ -2,7 +2,12 @@
 
 namespace sensormoniteringhub{
     namespace datapool{
-        DataPool::DataPool() : sensorDataSize(sizeof(sensordatareceiver::SensorData)) {}
+        DataPool::DataPool() : sensorDataSize(sizeof(sensordatareceiver::SensorData)) {
+            persistenceManagerInstance_ = std::make_unique<persistencemanager::PersistenceManager>();
+            if(!persistenceManagerInstance_){
+                logger::Logger::LOG("DataPool::DataPool", "Persistence Manager instance creation failed!", logger::LOGLEVEL::ERROR_LEVEL);
+            }
+        }
         void DataPool::StartService()
         {
             auto sharedDataStoreInstance{
@@ -12,7 +17,6 @@ namespace sensormoniteringhub{
             };
             if(sharedDataStoreInstance){
                 auto pair{sharedDataStoreInstance->GetMemoryLimit()};
-                maxEvents_ = sharedDataStoreInstance->GetMaxEvent();
                 maxMemoryLimit_ = pair.second;
                 memoryType_ = pair.first;
                 /**
@@ -27,14 +31,49 @@ namespace sensormoniteringhub{
                 logger::Logger::LOG("DataPool::StartService", "Memory config ["+memoryType_+":"+std::to_string(maxMemoryLimit_)+"]", logger::LOGLEVEL::DEBUG_LEVEL);
                 logger::Logger::LOG("DataPool::StartService", "sensor data size in bytes ["+std::to_string(sensorDataSize)+"]", logger::LOGLEVEL::DEBUG_LEVEL);
                 maxMemoryUsageBytes_.maxBytes = calculateSize(maxMemoryLimit_ * sensorDataSize);
+                maxEvents_ = (maxMemoryUsageBytes_.maxBytes / sensorDataSize);
+                logger::Logger::LOG("DataPool::StartService", "maxEvents_ calculated ["+std::to_string(maxEvents_)+"]", logger::LOGLEVEL::DEBUG_LEVEL);
                 logger::Logger::LOG("DataPool::StartService", "Calculated Max memory bytes ["+std::to_string(maxMemoryUsageBytes_.maxBytes)+"]", logger::LOGLEVEL::DEBUG_LEVEL);
+                logger::Logger::LOG("DataPool::StartService", "Calling startservice from Persistence Manager!");
+                persistenceManagerInstance_->SetMaxEvents(maxEvents_);
+                persistenceManagerInstance_->StartService();
+                if(persistenceManagerInstance_->GetRecoveredSensorData(receivedSensorDataContainer_)){
+                    lastReceivedSensorData_ = receivedSensorDataContainer_[0];
+                    currEventCount_ = (uint64_t) receivedSensorDataContainer_.size();
+                    currentMemoryUsageBytes_ = currEventCount_ * sensorDataSize;
+                    TakeUniqueZonesFromContainer();
+                    logger::Logger::LOG("DataPool::StartService", "Sensor data recovered by PeristenceManager. Total "+std::to_string(receivedSensorDataContainer_.size())+" sensor data recovered.");
+                }else{
+                    logger::Logger::LOG("DataPool::StartService", "Sensor data did not recovered by PeristenceManager", logger::LOGLEVEL::WARNING_LEVEL);
+                }
             }else{
                 logger::Logger::LOG("DataPool::StartService", "Shared Data store instance not available", logger::LOGLEVEL::ERROR_LEVEL);
             }
         }
 
+        /// @brief method to fill the unique zone id set with data from the retrieved container from persistence storage
+        void DataPool::TakeUniqueZonesFromContainer(){
+            /**
+             * no need to add lock here, because, when this method is invoked,
+             * it would be during initialization, and udp tcp listeners won't be up yet
+             */
+            std::transform(receivedSensorDataContainer_.begin(), receivedSensorDataContainer_.end(), 
+                std::inserter(uniqueZoneIds_, uniqueZoneIds_.end()), [](const sensordatareceiver::SensorData& data){
+                    return data.zoneId_;
+                }
+            );
+            logger::Logger::LOG("DataPool::TakeUniqueZonesFromContainer", "Unique zone ids fetched from the sensordatacontainer!");
+        }
+
         void DataPool::StopService()
         {
+            logger::Logger::LOG("DataPool::StopService", "Calling StopService from Persistence Manager!");
+            {
+                std::lock_guard<std::mutex> lock(receivedSensorDataContainerMutex_);
+                persistenceManagerInstance_->PersistSensorData(receivedSensorDataContainer_);
+            }
+            ClearEvents();
+            persistenceManagerInstance_->StopService();
         }
 
         void DataPool::Initialize()
@@ -100,8 +139,9 @@ namespace sensormoniteringhub{
             /**
              * No need to acquire lock again. In WriteDataFromUDPSensorsToDataPool method, lock is 
              * already aquired before calling this helper method.
+             * We already calculated max events from the size we calculated so checking just event count is enough
              */
-            if(((currEventCount_ + 1) < maxEvents_) && ((currentMemoryUsageBytes_ + sensorDataSize) < maxMemoryUsageBytes_.maxBytes)){
+            if(((currEventCount_ + 1) < maxEvents_)){
                 result = true;
             }
             return result;

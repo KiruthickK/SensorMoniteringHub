@@ -10,6 +10,7 @@ namespace sensormoniteringhub{
                 return;
             }
             std::string filename = generateFileName();
+            StopLoggingThread_.store(false);
             LogsFileEntryThread_ = std::thread([this, filename](){
                 std::error_code ec;
                 std::filesystem::create_directories("../logs", ec);

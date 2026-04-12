@@ -1,5 +1,6 @@
 # ignorable files will be added here
 /app/build
 /build
+/app/data
 /app/logs
 .vscode
